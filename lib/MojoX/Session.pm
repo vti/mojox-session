@@ -74,6 +74,10 @@ sub load {
         return unless $self->_remote_addr eq $o->data('__ip_match');
     }
 
+    $o->extend_expires($self->expires);
+
+    $self->transport->set($o->sid, $o->expires) if $self->transport;
+
     $self->o($o);
 
     $self->_is_stored(1);

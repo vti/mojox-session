@@ -66,6 +66,13 @@ sub clear {
     $self->_data({});
 }
 
+sub extend_expires {
+    my $self = shift;
+    my ($delta) = @_;
+
+    $self->expires($self->expires + $delta);
+}
+
 1;
 __END__
 
