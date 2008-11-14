@@ -12,9 +12,10 @@ WriteMakefile(
         : ()),
     PL_FILES  => {},
     PREREQ_PM => {
-        'Test::More'       => 0,
-        'Mojo'             => 0,
-        'Session' => 0
+        'Test::More'   => 0,
+        'Mojo'         => 0,
+        'Storable'     => 0,
+        'MIME::Base64' => 0,
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
     clean => {FILES    => 'MojoX-Session-*'}
