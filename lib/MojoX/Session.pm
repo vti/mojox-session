@@ -17,6 +17,7 @@ __PACKAGE__->attr('expires', default => 3600, chained => 1);
 
 __PACKAGE__->attr('_is_new', default => 0);
 __PACKAGE__->attr('_is_expired', default => 0);
+__PACKAGE__->attr('_is_stored', default => 0);
 
 __PACKAGE__->attr('o', chained => 1);
 
@@ -82,12 +83,21 @@ sub flush {
     my $self = shift;
 
     my $o = $self->o;
+
+    if ($self->_is_expired && $self->_is_stored) {
+        $self->store->delete($o->sid);
+        $self->_is_stored(0);
+        return;
+    }
+
     if ($self->_is_new) {
         $self->store->create($o->sid, $o->expires, $o->data);
         $self->_is_new(0);
     } else {
         $self->store->update($o->sid, $o->expires, $o->data);
     }
+
+    $self->_is_stored(1);
 }
 
 sub sid {
