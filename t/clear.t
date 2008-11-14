@@ -9,5 +9,5 @@ $session->data('foo' => 'bar');
 $session->clear;
 
 ok($session->sid);
-ok($session->expires);
+ok($session->expires_delta);
 ok(not defined $session->data('foo'));

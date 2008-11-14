@@ -127,6 +127,12 @@ Session data accessor.
 
 Check if session is expired.
 
+=head2 C<extend_expires>
+
+    $o->extend_expires($delta);
+
+Extend session expire time by delta.
+
 =head2 C<clear>
 
 Clear all data in session.

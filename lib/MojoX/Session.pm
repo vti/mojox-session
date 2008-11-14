@@ -13,7 +13,7 @@ __PACKAGE__->attr('store', chained => 1);
 __PACKAGE__->attr('transport', chained => 1);
 
 __PACKAGE__->attr('ip_match', default => 0, chained => 1);
-__PACKAGE__->attr('expires', default => 3600, chained => 1);
+__PACKAGE__->attr('expires_delta', default => 3600, chained => 1);
 
 __PACKAGE__->attr('_is_new', default => 0);
 __PACKAGE__->attr('_is_expired', default => 0);
@@ -24,7 +24,7 @@ __PACKAGE__->attr('o', chained => 1);
 sub create {
     my $self = shift;
 
-    my $expires = time + $self->expires;
+    my $expires = time + $self->expires_delta;
     my $o = MojoX::Session::Object->new(expires => $expires);
 
     $self->_is_new(1);
@@ -74,7 +74,7 @@ sub load {
         return unless $self->_remote_addr eq $o->data('__ip_match');
     }
 
-    $o->extend_expires($self->expires);
+    $o->extend_expires($self->expires_delta);
 
     $self->transport->set($o->sid, $o->expires) if $self->transport;
 
@@ -193,12 +193,12 @@ L<MojoX::Session> implements the following attributes.
     my $ip_match = $session->ip_match;
     $ip_match    = $session->ip_match(0);
 
-=head2 C<expires>
+=head2 C<expires_delta>
 
     Seconds until session is considered expired
 
-    my $expires = $session->expires;
-    $expires    = $session->expires(3600);
+    my $expires_delta = $session->expires_delta;
+    $expires_delta    = $session->expires_delta(3600);
 
 =head1 METHODS
 

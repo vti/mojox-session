@@ -17,7 +17,7 @@ my $tx = Mojo::Transaction->new();
 my $session = MojoX::Session->new(
     store     => MojoX::Session::Store::DBI->new(dbh       => $dbh),
     transport => MojoX::Session::Transport::Cookie->new(tx => $tx),
-    expires   => 1
+    expires_delta   => 1
 );
 
 my $sid = $session->create();
