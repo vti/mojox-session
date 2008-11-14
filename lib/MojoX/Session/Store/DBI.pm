@@ -63,6 +63,13 @@ MojoX::Session::Store::DBI - DBI Store for MojoX::Session
 
 =head1 SYNOPSIS
 
+    CREATE TABLE session (
+        sid          VARCHAR(32) PRIMARY KEY,
+        data         TEXT,
+        expires      INTEGER UNSIGNED NOT NULL,
+        UNIQUE(sid)
+    );
+
     my $session = MojoX::Session->new(
         store => MojoX::Session::Store::DBI->new(dbh  => $dbh),
         ...
