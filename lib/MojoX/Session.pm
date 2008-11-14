@@ -29,7 +29,7 @@ sub create {
     $self->_is_new(1);
 
     if ($self->ip_match) {
-        $o->data('__ip_match', $ENV{REMOTE_ADDR});
+        $o->data('__ip_match', $self->_remote_addr);
     }
 
     $self->o($o);
@@ -66,11 +66,11 @@ sub load {
     }
 
     if ($self->ip_match) {
-        return unless $ENV{REMOTE_ADDR};
+        return unless $self->_remote_addr;
 
         return unless $o->data('__ip_match');
 
-        return unless $ENV{REMOTE_ADDR} eq $o->data('__ip_match');
+        return unless $self->_remote_addr eq $o->data('__ip_match');
     }
 
     $self->o($o);
@@ -113,6 +113,8 @@ sub expire {
     $self->_is_expired(1);
     return $self;
 }
+
+sub _remote_addr { $ENV{REMOTE_ADDR} }
 
 1;
 __END__
