@@ -1,11 +1,13 @@
 use Test::More tests => 11;
 
+use lib 't/lib';
+
+use NewDB;
+
 use_ok('MojoX::Session');
 use_ok('MojoX::Session::Store::DBI');
 
-use DBI;
-
-my $dbh = DBI->connect("dbi:SQLite:table.db") or die $DBI::errstr;
+my $dbh = NewDB->dbh;
 
 my $session =
   MojoX::Session->new(store => MojoX::Session::Store::DBI->new(dbh => $dbh),);

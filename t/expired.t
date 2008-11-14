@@ -1,14 +1,17 @@
 use Test::More tests => 4;
 
+use lib 't/lib';
+
+use NewDB;
+
 use_ok('MojoX::Session');
 use_ok('MojoX::Session::Store::DBI');
 use_ok('MojoX::Session::Transport::Cookie');
 
-use DBI;
 use Mojo::Transaction;
 use Mojo::Cookie::Request;
 
-my $dbh = DBI->connect("dbi:SQLite:table.db") or die $DBI::errstr;
+my $dbh = NewDB->dbh;
 my $tx = Mojo::Transaction->new();
 
 my $session = MojoX::Session->new(
