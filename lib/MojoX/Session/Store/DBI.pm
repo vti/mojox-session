@@ -9,14 +9,23 @@ use MIME::Base64;
 use Storable qw/nfreeze thaw/;
 
 __PACKAGE__->attr('dbh', chained => 1);
+__PACKAGE__->attr('table', default => 'session', chained => 1);
+__PACKAGE__->attr('sid_column', default => 'sid', chained => 1);
+__PACKAGE__->attr('expires_column', default => 'expires', chained => 1);
+__PACKAGE__->attr('data_column', default => 'data', chained => 1);
 
 sub create {
     my ($self, $sid, $expires, $data) = @_;
 
     $data = encode_base64(nfreeze($data)) if $data;
 
-    my $sth = $self->dbh->prepare(
-        "INSERT INTO session (sid,expires,data) VALUES (?,?,?)");
+    my $table          = $self->table;
+    my $sid_column     = $self->sid_column;
+    my $expires_column = $self->expires_column;
+    my $data_column    = $self->data_column;
+
+    my $sth = $self->dbh->prepare(<<"");
+    INSERT INTO $table ($sid_column,$expires_column,$data_column) VALUES (?,?,?)
 
     return $sth->execute($sid, $expires, $data);
 }
@@ -26,8 +35,13 @@ sub update {
 
     $data = encode_base64(nfreeze($data)) if $data;
 
-    my $sth = $self->dbh->prepare(
-        "UPDATE session SET expires=?,data=? WHERE sid=?");
+    my $table          = $self->table;
+    my $sid_column     = $self->sid_column;
+    my $expires_column = $self->expires_column;
+    my $data_column    = $self->data_column;
+
+    my $sth = $self->dbh->prepare(<<"");
+    UPDATE $table SET $expires_column=?,$data_column=? WHERE $sid_column=?
 
     return $sth->execute($expires, $data, $sid);
 }
@@ -35,7 +49,10 @@ sub update {
 sub load {
     my ($self, $sid) = @_;
 
-    my $sth = $self->dbh->prepare("SELECT * FROM session WHERE sid=?");
+    my $table          = $self->table;
+    my $sid_column     = $self->sid_column;
+
+    my $sth = $self->dbh->prepare("SELECT * FROM $table WHERE $sid_column=?");
     my $rv = $sth->execute($sid);
     return unless $rv;
 
@@ -50,7 +67,10 @@ sub load {
 sub delete {
     my ($self, $sid) = @_;
 
-    my $sth = $self->dbh->prepare("DELETE FROM session WHERE sid=?");
+    my $table          = $self->table;
+    my $sid_column     = $self->sid_column;
+
+    my $sth = $self->dbh->prepare("DELETE FROM $table WHERE $sid_column=?");
     return $sth->execute($sid);
 }
 
@@ -90,6 +110,22 @@ L<MojoX::Session::Store::DBI> implements the following attributes.
     $store  = $store->dbh($dbh);
 
 Get and set dbh handler.
+
+=head2 C<table>
+
+Table name. Default is 'session'.
+
+=head2 C<sid_column>
+
+Session id column name. Default is 'sid'.
+
+=head2 C<expires_column>
+
+Expires column name name. Default is 'expires'.
+
+=head2 C<data_column>
+
+Data column name. Default is 'data'.
 
 =head1 METHODS
 
