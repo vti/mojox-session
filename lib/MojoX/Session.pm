@@ -76,6 +76,8 @@ sub load {
 
     $self->o($o);
 
+    $self->_is_stored(1);
+
     return $self->sid;
 }
 
@@ -112,14 +114,13 @@ sub data {
 
 sub clear {
     my $self = shift;
-    $self->sid(undef);
-    $self->expires(0);
     $self->o->clear;
 }
 
 sub expire {
     my $self = shift;
     $self->clear;
+    $self->o->expires(0);
     $self->_is_expired(1);
     return $self;
 }
