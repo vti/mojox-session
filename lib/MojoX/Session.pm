@@ -129,6 +129,12 @@ sub expire {
     return $self;
 }
 
+sub expires {
+    my $self = shift;
+
+    return $self->o->expires;
+}
+
 sub _remote_addr { $ENV{REMOTE_ADDR} }
 
 sub DESTROY {
@@ -255,6 +261,12 @@ Get and set values to the session.
     $session->flush;
 
 Clear session values. Call flush if you want to clear it in the store.
+
+=head2 C<expires>
+
+    $session->expires;
+
+Return session expire time.
 
 =head2 C<expire>
 
