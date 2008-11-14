@@ -87,16 +87,16 @@ sub flush {
     my $o = $self->o;
 
     if ($self->_is_expired && $self->_is_stored) {
-        $self->store->delete($o->sid);
+        $self->store->delete($o->sid) if $self->store;
         $self->_is_stored(0);
         return;
     }
 
     if ($self->_is_new) {
-        $self->store->create($o->sid, $o->expires, $o->data);
+        $self->store->create($o->sid, $o->expires, $o->data) if $self->store;
         $self->_is_new(0);
     } else {
-        $self->store->update($o->sid, $o->expires, $o->data);
+        $self->store->update($o->sid, $o->expires, $o->data) if $self->store;
     }
 
     $self->_is_stored(1);
@@ -126,6 +126,12 @@ sub expire {
 }
 
 sub _remote_addr { $ENV{REMOTE_ADDR} }
+
+sub DESTROY {
+    my $self = shift;
+
+    $self->flush();
+}
 
 1;
 __END__
