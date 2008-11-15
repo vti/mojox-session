@@ -7,7 +7,7 @@ our $VERSION = '0.01';
 
 use base 'Mojo::Base';
 
-use MojoX::Session::Object;
+use Digest::SHA1 'sha1_hex';
 
 __PACKAGE__->attr('store', chained => 1);
 __PACKAGE__->attr('transport', chained => 1);
@@ -18,24 +18,28 @@ __PACKAGE__->attr('expires_delta', default => 3600, chained => 1);
 __PACKAGE__->attr('_is_new', default => 0);
 __PACKAGE__->attr('_is_expired', default => 0);
 __PACKAGE__->attr('_is_stored', default => 0);
+__PACKAGE__->attr('_is_flushed', default => 1);
 
-__PACKAGE__->attr('o', chained => 1);
+__PACKAGE__->attr('sid', chained => 1);
+__PACKAGE__->attr('expires', chained => 1, default => 0);
+__PACKAGE__->attr('_data', default => sub {{}});
 
 sub create {
     my $self = shift;
 
-    my $expires = time + $self->expires_delta;
-    my $o = MojoX::Session::Object->new(expires => $expires);
+    $self->expires(time + $self->expires_delta);
 
     $self->_is_new(1);
 
     if ($self->ip_match) {
-        $o->data('__ip_match', $self->_remote_addr);
+        $self->data('__ip_match', $self->_remote_addr);
     }
 
-    $self->o($o);
+    $self->_generate_sid;
 
-    $self->transport->set($o->sid, $expires) if $self->transport;
+    $self->transport->set($self->sid, $self->expires) if $self->transport;
+
+    $self->_is_flushed(0);
 
     return $self->sid;
 }
@@ -52,16 +56,12 @@ sub load {
     my ($expires, $data) = $self->store->load($sid);
     return unless $expires;
 
-    my $o = MojoX::Session::Object->new(
-        sid     => $sid,
-        expires => $expires
-    );
+    $self->sid($sid);
+    $self->expires($expires);
 
-    while (my ($key, $value) = each %$data) {
-        $o->data($key, $value);
-    }
+    $self->_data($data);
 
-    if ($o->is_expired) {
+    if ($self->is_expired) {
         $self->store->delete($sid);
         return;
     }
@@ -69,16 +69,14 @@ sub load {
     if ($self->ip_match) {
         return unless $self->_remote_addr;
 
-        return unless $o->data('__ip_match');
+        return unless $self->data('__ip_match');
 
-        return unless $self->_remote_addr eq $o->data('__ip_match');
+        return unless $self->_remote_addr eq $self->data('__ip_match');
     }
 
-    $o->extend_expires($self->expires_delta);
+    $self->extend_expires;
 
-    $self->transport->set($o->sid, $o->expires) if $self->transport;
-
-    $self->o($o);
+    $self->transport->set($self->sid, $self->expires) if $self->transport;
 
     $self->_is_stored(1);
 
@@ -88,54 +86,81 @@ sub load {
 sub flush {
     my $self = shift;
 
-    my $o = $self->o;
+    return unless $self->sid && !$self->_is_flushed;
+
+    warn 'Store is not defined' unless $self->store;
 
     if ($self->_is_expired && $self->_is_stored) {
-        $self->store->delete($o->sid) if $self->store;
+        $self->store->delete($self->sid) if $self->store;
         $self->_is_stored(0);
+        $self->_is_flushed(1);
         return;
     }
 
     if ($self->_is_new) {
-        $self->store->create($o->sid, $o->expires, $o->data) if $self->store;
+        $self->store->create($self->sid, $self->expires, $self->data) if $self->store;
         $self->_is_new(0);
     } else {
-        $self->store->update($o->sid, $o->expires, $o->data) if $self->store;
+        $self->store->update($self->sid, $self->expires, $self->data) if $self->store;
     }
 
     $self->_is_stored(1);
-}
-
-sub sid {
-    my $self = shift;
-    return $self->o->sid(@_);
+    $self->_is_flushed(1);
 }
 
 sub data {
     my $self = shift;
-    return $self->o->data(@_);
+    my ($key, $value) = @_;
+
+    if ($key) {
+        if ($value) {
+            $self->_data->{$key} = $value;
+            $self->_is_flushed(0);
+        } else {
+            return $self->_data->{$key};
+        }
+    } else {
+        return $self->_data;
+    }
 }
 
 sub clear {
     my $self = shift;
-    $self->o->clear;
+    $self->_data({});
 }
 
 sub expire {
     my $self = shift;
     $self->clear;
-    $self->o->expires(0);
+    $self->expires(0);
     $self->_is_expired(1);
+    $self->_is_flushed(0);
     return $self;
 }
 
-sub expires {
+sub extend_expires {
     my $self = shift;
 
-    return $self->o->expires;
+    $self->expires($self->expires + $self->expires_delta);
+    $self->_is_flushed(0);
+}
+
+sub is_expired {
+    my ($self) = shift;
+
+    return time > $self->expires;
 }
 
 sub _remote_addr { $ENV{REMOTE_ADDR} }
+
+sub _generate_sid {
+    my $self = shift;
+
+    # based on CGI::Session::ID
+    my $sha1 = Digest::SHA1->new();
+    $sha1->add($$, time, rand(time));
+    $self->sid($sha1->hexdigest);
+}
 
 sub DESTROY {
     my $self = shift;
