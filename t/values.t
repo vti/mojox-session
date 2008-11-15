@@ -1,16 +1,13 @@
-use Test::More tests => 11;
+use Test::More tests => 10;
 
 use lib 't/lib';
 
-use NewDB;
-
 use_ok('MojoX::Session');
-use_ok('MojoX::Session::Store::DBI');
 
-my $dbh = NewDB->dbh;
+use MojoX::Session::Store::Dummy;
 
 my $session =
-  MojoX::Session->new(store => MojoX::Session::Store::DBI->new(dbh => $dbh),);
+  MojoX::Session->new(store => MojoX::Session::Store::Dummy->new());
 
 $session->create();
 my $sid = $session->sid;

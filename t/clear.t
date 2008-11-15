@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More tests => 6;
 
 use_ok('MojoX::Session');
 
@@ -10,4 +10,12 @@ $session->clear;
 
 ok($session->sid);
 ok($session->expires_delta);
-ok(not defined $session->data('foo'));
+is_deeply($session->data, {});
+
+$session->data('foo' => 'bar', 'baz' => 'faz');
+$session->clear('foo');
+is_deeply($session->data, {baz => 'faz'});
+
+$session->clear();
+$session->data('foo' => undef);
+is_deeply($session->data, {foo => undef});

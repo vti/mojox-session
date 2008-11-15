@@ -1,4 +1,4 @@
-use Test::More tests => 5;
+use Test::More tests => 6;
 
 use lib 't/lib';
 
@@ -10,20 +10,13 @@ use MojoX::Session::Transport::Dummy;
 my $session = MojoX::Session->new(
     store     => MojoX::Session::Store::Dummy->new(),
     transport => MojoX::Session::Transport::Dummy->new(),
-    expires_delta   => 1
+    expires   => 30
 );
 
 my $sid = $session->create();
+ok($sid);
+ok($session->expires >= time + 30);
+is_deeply($session->data, {});
+is($session->transport->set, $sid);
 $session->flush();
-
-diag 'Sleep 2 seconds to expire session';
-sleep(2);
-
-$session->transport->get($sid);
-ok($session->load());
-is($session->is_expired, 1);
-$session->extend_expires;
-$session->flush;
-
-ok($session->load());
-is($session->is_expired, 0);
+ok($session->store->sessions->{$sid});

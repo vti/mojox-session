@@ -2,30 +2,22 @@ use Test::More tests => 4;
 
 use lib 't/lib';
 
-use NewDB;
-
 use_ok('MojoX::Session');
-use_ok('MojoX::Session::Store::DBI');
-use_ok('MojoX::Session::Transport::Cookie');
 
-use Mojo::Transaction;
-use Mojo::Cookie::Request;
-
-my $dbh = NewDB->dbh;
-my $tx = Mojo::Transaction->new();
+use MojoX::Session::Store::Dummy;
+use MojoX::Session::Transport::Dummy;
 
 my $session = MojoX::Session->new(
-    store     => MojoX::Session::Store::DBI->new(dbh       => $dbh),
-    transport => MojoX::Session::Transport::Cookie->new(tx => $tx)
+    store     => MojoX::Session::Store::Dummy->new(),
+    transport => MojoX::Session::Transport::Dummy->new(),
 );
 
 my $sid = $session->create();
 $session->flush();
 
+is($session->is_expired, 0);
 $session->expire();
+is($session->is_expired, 1);
 $session->flush();
-
-my $cookie = Mojo::Cookie::Request->new(name => 'sid', value => $sid);
-$tx->req->cookies($cookie);
 
 ok(not defined $session->load());

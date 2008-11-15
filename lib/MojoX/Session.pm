@@ -16,18 +16,17 @@ __PACKAGE__->attr('ip_match', default => 0, chained => 1);
 __PACKAGE__->attr('expires_delta', default => 3600, chained => 1);
 
 __PACKAGE__->attr('_is_new', default => 0);
-__PACKAGE__->attr('_is_expired', default => 0);
 __PACKAGE__->attr('_is_stored', default => 0);
 __PACKAGE__->attr('_is_flushed', default => 1);
 
 __PACKAGE__->attr('sid', chained => 1);
-__PACKAGE__->attr('expires', chained => 1, default => 0);
+__PACKAGE__->attr('_expires', chained => 1, default => 0);
 __PACKAGE__->attr('_data', default => sub {{}});
 
 sub create {
     my $self = shift;
 
-    $self->expires(time + $self->expires_delta);
+    $self->_expires(time + $self->expires_delta);
 
     $self->_is_new(1);
 
@@ -48,23 +47,21 @@ sub load {
     my $self = shift;
     my ($sid) = @_;
 
+    $self->sid(undef);
+    $self->_expires(0);
+    $self->_data({});
+
     unless ($sid) {
         $sid = $self->transport->get if $self->transport;
         return unless $sid;
     }
 
     my ($expires, $data) = $self->store->load($sid);
-    return unless $expires;
+    return unless defined $expires && defined $data;
 
     $self->sid($sid);
-    $self->expires($expires);
-
+    $self->_expires($expires);
     $self->_data($data);
-
-    if ($self->is_expired) {
-        $self->store->delete($sid);
-        return;
-    }
 
     if ($self->ip_match) {
         return unless $self->_remote_addr;
@@ -73,10 +70,6 @@ sub load {
 
         return unless $self->_remote_addr eq $self->data('__ip_match');
     }
-
-    $self->extend_expires;
-
-    $self->transport->set($self->sid, $self->expires) if $self->transport;
 
     $self->_is_stored(1);
 
@@ -88,9 +81,7 @@ sub flush {
 
     return unless $self->sid && !$self->_is_flushed;
 
-    warn 'Store is not defined' unless $self->store;
-
-    if ($self->_is_expired && $self->_is_stored) {
+    if ($self->is_expired && $self->_is_stored) {
         $self->store->delete($self->sid) if $self->store;
         $self->_is_stored(0);
         $self->_is_flushed(1);
@@ -98,10 +89,12 @@ sub flush {
     }
 
     if ($self->_is_new) {
-        $self->store->create($self->sid, $self->expires, $self->data) if $self->store;
+        $self->store->create($self->sid, $self->expires, $self->data)
+          if $self->store;
         $self->_is_new(0);
     } else {
-        $self->store->update($self->sid, $self->expires, $self->data) if $self->store;
+        $self->store->update($self->sid, $self->expires, $self->data)
+          if $self->store;
     }
 
     $self->_is_stored(1);
@@ -110,45 +103,67 @@ sub flush {
 
 sub data {
     my $self = shift;
-    my ($key, $value) = @_;
 
-    if ($key) {
-        if ($value) {
-            $self->_data->{$key} = $value;
-            $self->_is_flushed(0);
-        } else {
-            return $self->_data->{$key};
-        }
-    } else {
+    if (@_ == 0) {
         return $self->_data;
     }
+
+    if (@_ == 1) {
+        return $self->_data->{$_[0]};
+    }
+
+    my %params = @_;
+
+    $self->_data(\%params);
+    $self->_is_flushed(0);
 }
 
 sub clear {
     my $self = shift;
-    $self->_data({});
+    my ($key) = @_;
+
+    if ($key) {
+        delete $self->_data->{$key};
+    } else {
+        $self->_data({});
+    }
 }
 
 sub expire {
     my $self = shift;
-    $self->clear;
-    $self->expires(0);
-    $self->_is_expired(1);
-    $self->_is_flushed(0);
+    $self->expires(time - 30 * 24 * 3600);
+
+    $self->transport->set($self->sid, $self->expires) if $self->transport;
+
     return $self;
+}
+
+sub expires {
+    my $self = shift;
+    my ($val) = @_;
+
+    if (defined $val) {
+        $self->_expires($val);
+        $self->_is_flushed(0);
+    }
+
+    return $self->_expires;
 }
 
 sub extend_expires {
     my $self = shift;
 
-    $self->expires($self->expires + $self->expires_delta);
+    $self->_expires(time + $self->expires_delta);
+
+    $self->transport->set($self->sid, $self->expires) if $self->transport;
+
     $self->_is_flushed(0);
 }
 
 sub is_expired {
     my ($self) = shift;
 
-    return time > $self->expires;
+    return time > $self->expires ? 1 : 0;
 }
 
 sub _remote_addr { $ENV{REMOTE_ADDR} }
@@ -191,7 +206,11 @@ MojoX::Session - Session management for Mojo
     $session->data('foo' => 'bar'); # set foo to bar
     $session->data('foo'); # get foo value
 
+    $session->data('foo' => undef); # works
+    $session->clear('foo'); # delete foo from data
+
     $session->flush(); # writes session to the store
+    undef $session;    # same as above
 
 =head1 DESCRIPTION
 
@@ -256,13 +275,18 @@ store it.
     $session->load($sid);
 
 Tries to load session from the store, gets sid from transport unless it is
-provided.
+provided. If sesssion is expired it will loaded also.
 
 =head2 C<flush>
 
     $session->flush;
 
-Actually writes session to the store.
+Flush actually writes to the store in these situations:
+- new session was created (inserts it);
+- any value was changed (updates it)
+- session is expired (deletes it)
+
+Flush is also called on object destruction.
 
 =head2 C<sid>
 
@@ -274,6 +298,8 @@ Returns session id.
     
     my $foo = $session->data('foo');
     $session->data('foo' => 'bar');
+    $session->data('foo' => 'bar', 'bar' => 'foo');
+    $session->data('foo' => undef);
     # or
     my $foo = $session->data->{foo};
     $session->data->{foo} = 'bar';
@@ -282,10 +308,12 @@ Get and set values to the session.
 
 =head2 C<clear>
 
+    $session->clear('bar');
     $session->clear;
     $session->flush;
 
-Clear session values. Call flush if you want to clear it in the store.
+Clear session values. Delete only one value if argument is provided.  Call flush
+if you want to clear it in the store.
 
 =head2 C<expires>
 
@@ -299,6 +327,8 @@ Return session expire time.
     $session->flush;
 
 Force session to expire. Call flush if you want to remove it from the store.
+Flush will be called also on object destruction and will automatically delete
+expired session from the store.
 
 =head1 SEE ALSO
 
