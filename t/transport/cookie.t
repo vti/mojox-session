@@ -1,4 +1,4 @@
-use Test::More tests => 6;
+use Test::More tests => 8;
 
 use lib 't/lib';
 
@@ -38,5 +38,12 @@ $session->flush;
 my $new_cookie = $tx->res->cookies->[0];
 ok($old_cookie->expires->epoch < $new_cookie->expires->epoch);
 
+use Data::Dumper;
 $session->expire;
+ok($tx->res->cookies->[0]->expires->epoch <= time - 30 * 24 * 3600);
+
+my $tx = Mojo::Transaction->new();
+$session->transport->tx($tx);
+$session->load(123);
+is($session->is_expired, 1);
 ok($tx->res->cookies->[0]->expires->epoch < time);

@@ -29,6 +29,7 @@ sub set {
     my ($self, $sid, $expires) = @_;
 
     my $cookie = Mojo::Cookie::Response->new();
+
     $cookie->name($self->name)->value($sid);
     $cookie->expires($expires);
 

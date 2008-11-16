@@ -57,7 +57,10 @@ sub load {
     }
 
     my ($expires, $data) = $self->store->load($sid);
-    return unless defined $expires && defined $data;
+    unless (defined $expires && defined $data) {
+        $self->transport->set($sid, time - 30 * 24 * 3600) if $self->transport;
+        return;
+    }
 
     $self->sid($sid);
     $self->_expires($expires);
