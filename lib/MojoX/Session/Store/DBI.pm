@@ -97,8 +97,8 @@ MojoX::Session::Store::DBI - DBI Store for MojoX::Session
 
 =head1 DESCRIPTION
 
-L<MojoX::Session::Store::DBI> is a store for L<MojoX::Session> that stores
-session in database.
+L<MojoX::Session::Store::DBI> is a store for L<MojoX::Session> that stores a
+session in a database.
 
 =head1 ATTRIBUTES
 
@@ -121,7 +121,7 @@ Session id column name. Default is 'sid'.
 
 =head2 C<expires_column>
 
-Expires column name name. Default is 'expires'.
+Expires column name. Default is 'expires'.
 
 =head2 C<data_column>
 
