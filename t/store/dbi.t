@@ -1,6 +1,11 @@
-use Test::More tests => 8;
+use Test::More;
+
+eval "use DBD::SQLite";
+plan skip_all => "DBD::SQLite is required to run this test" if $@;
 
 use lib 't/lib';
+
+plan tests => 8;
 
 use_ok('MojoX::Session');
 use_ok('MojoX::Session::Store::DBI');

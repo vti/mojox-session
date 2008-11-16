@@ -321,8 +321,9 @@ if you want to clear it in the store.
 =head2 C<expires>
 
     $session->expires;
+    $session->expires(123456789);
 
-Return session expire time.
+Get/set session expire time.
 
 =head2 C<expire>
 
@@ -332,6 +333,14 @@ Return session expire time.
 Force session to expire. Call flush if you want to remove it from the store.
 Flush will be called also on object destruction and will automatically delete
 expired session from the store.
+
+=head2 C<is_expired>
+
+Check if session is expired.
+
+=head2 C<extend_expires>
+
+Entend session expires time. Set it to current_time + expires_delta.
 
 =head1 SEE ALSO
 
