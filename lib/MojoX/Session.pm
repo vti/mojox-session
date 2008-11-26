@@ -3,7 +3,7 @@ package MojoX::Session;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.03';
 
 use base 'Mojo::Base';
 
@@ -121,6 +121,15 @@ sub data {
     $self->_is_flushed(0);
 }
 
+sub flash {
+    my $self = shift;
+    my ($key) = @_;
+
+    return unless $key;
+
+    return delete $self->data->{$key};
+}
+
 sub clear {
     my $self = shift;
     my ($key) = @_;
@@ -178,12 +187,6 @@ sub _generate_sid {
     my $sha1 = Digest::SHA1->new();
     $sha1->add($$, time, rand(time));
     $self->sid($sha1->hexdigest);
-}
-
-sub DESTROY {
-    my $self = shift;
-
-    $self->flush();
 }
 
 1;
@@ -289,8 +292,6 @@ Flush actually writes to the store in these situations:
 - any value was changed (updates it)
 - session is expired (deletes it)
 
-Flush is also called on object destruction.
-
 =head2 C<sid>
 
     my $sid = $session->sid;
@@ -308,6 +309,16 @@ Returns session id.
     $session->data->{foo} = 'bar';
 
 Get and set values to the session.
+
+=head2 C<flash>
+
+    my $foo = $session->data('foo');
+    $session->data('foo' => 'bar');
+    $session->flash('foo'); # get foo and delete it from data
+    $session->data('foo');  # undef
+
+Get value and delete it from data. Usefull when you want to store error messages
+etc.
 
 =head2 C<clear>
 
@@ -331,8 +342,6 @@ Get/set session expire time.
     $session->flush;
 
 Force session to expire. Call flush if you want to remove it from the store.
-Flush will be called also on object destruction and will automatically delete
-expired session from the store.
 
 =head2 C<is_expired>
 

@@ -27,6 +27,8 @@ sub create {
     my $sth = $self->dbh->prepare(<<"");
     INSERT INTO $table ($sid_column,$expires_column,$data_column) VALUES (?,?,?)
 
+    return unless $sth;
+
     return $sth->execute($sid, $expires, $data);
 }
 
@@ -43,6 +45,8 @@ sub update {
     my $sth = $self->dbh->prepare(<<"");
     UPDATE $table SET $expires_column=?,$data_column=? WHERE $sid_column=?
 
+    return unless $sth;
+
     return $sth->execute($expires, $data, $sid);
 }
 
@@ -53,6 +57,8 @@ sub load {
     my $sid_column     = $self->sid_column;
 
     my $sth = $self->dbh->prepare("SELECT * FROM $table WHERE $sid_column=?");
+    return unless $sth;
+
     my $rv = $sth->execute($sid);
     return unless $rv;
 
@@ -71,6 +77,8 @@ sub delete {
     my $sid_column     = $self->sid_column;
 
     my $sth = $self->dbh->prepare("DELETE FROM $table WHERE $sid_column=?");
+    return unless $sth;
+
     return $sth->execute($sid);
 }
 

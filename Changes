@@ -1,5 +1,13 @@
 Revision history for MojoX-Session
 
-0.01    2008-11-12 00:00:00
+0.03    2008-11-26 00:00:00
+        - flash
+        - No flush on object desctruction, bad practice
+
+0.02    2008-11-18 00:00:00
+        - Digest::SHA1 in dependencies
+        - Made tx ref weak
+
+0.01    2008-11-16 00:00:00
         First version
 
