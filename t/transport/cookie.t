@@ -1,4 +1,4 @@
-use Test::More tests => 8;
+use Test::More tests => 9;
 
 use lib 't/lib';
 
@@ -41,6 +41,7 @@ ok($old_cookie->expires->epoch < $new_cookie->expires->epoch);
 use Data::Dumper;
 $session->expire;
 ok($tx->res->cookies->[0]->expires->epoch <= time - 30 * 24 * 3600);
+is($tx->res->cookies->[0]->max_age, 0);
 
 my $tx = Mojo::Transaction->new();
 $session->transport->tx($tx);

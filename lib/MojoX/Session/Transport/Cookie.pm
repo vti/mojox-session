@@ -33,6 +33,8 @@ sub set {
     $cookie->name($self->name)->value($sid);
     $cookie->expires($expires);
 
+    $cookie->max_age(0) if $expires < time;
+
     $self->tx->res->cookies($cookie);
 }
 
