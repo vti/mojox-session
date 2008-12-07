@@ -117,7 +117,7 @@ sub data {
 
     my %params = @_;
 
-    $self->_data(\%params);
+    $self->_data({%{$self->_data}, %params});
     $self->_is_flushed(0);
 }
 

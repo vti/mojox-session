@@ -1,4 +1,4 @@
-use Test::More tests => 10;
+use Test::More tests => 11;
 
 use lib 't/lib';
 
@@ -25,7 +25,9 @@ $session->flush();
 ok($session->load($sid));
 is($session->data('foo'), 'baz');
 $session->data('foo' => 'zab');
+$session->data('zab' => 'foo');
 $session->flush();
 
 ok($session->load($sid));
 is($session->data('foo'), 'zab');
+is($session->data('zab'), 'foo');
