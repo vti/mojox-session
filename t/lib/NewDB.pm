@@ -16,7 +16,7 @@ sub dbh {
     unless ($exists) {
         my $sth = $dbh->prepare(<<"");
             CREATE TABLE session (
-                sid          VARCHAR(32) PRIMARY KEY,
+                sid          VARCHAR(40) PRIMARY KEY,
                 data         TEXT,
                 expires      INTEGER UNSIGNED NOT NULL,
                 UNIQUE(sid)

@@ -7,7 +7,7 @@ our $VERSION = '0.04';
 
 use base 'Mojo::Base';
 
-use Digest::SHA1 'sha1_hex';
+use Digest::SHA1;
 
 __PACKAGE__->attr('store', chained => 1);
 __PACKAGE__->attr('transport', chained => 1);
@@ -362,6 +362,7 @@ L<CGI::Session>, L<HTTP::Session>
 =head1 AUTHOR
 
 vti, C<vti@cpan.org>.
+
 
 =head1 COPYRIGHT
 

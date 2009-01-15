@@ -92,7 +92,7 @@ MojoX::Session::Store::DBI - DBI Store for MojoX::Session
 =head1 SYNOPSIS
 
     CREATE TABLE session (
-        sid          VARCHAR(32) PRIMARY KEY,
+        sid          VARCHAR(40) PRIMARY KEY,
         data         TEXT,
         expires      INTEGER UNSIGNED NOT NULL,
         UNIQUE(sid)
