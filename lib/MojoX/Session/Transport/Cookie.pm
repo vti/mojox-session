@@ -10,6 +10,9 @@ use Mojo::Cookie::Response;
 
 __PACKAGE__->attr('tx', chained => 1, weak => 1);
 __PACKAGE__->attr('name', default => 'sid', chained => 1);
+__PACKAGE__->attr('path', default => '/', chained => 1);
+__PACKAGE__->attr('domain', chained => 1);
+__PACKAGE__->attr('secure', chained => 1);
 
 sub get {
     my ($self) = @_;
@@ -31,6 +34,9 @@ sub set {
     my $cookie = Mojo::Cookie::Response->new();
 
     $cookie->name($self->name)->value($sid);
+    $cookie->path($self->path);
+    $cookie->domain($self->domain);
+    $cookie->secure($self->secure);
     $cookie->expires($expires);
 
     $cookie->max_age(0) if $expires < time;
@@ -62,11 +68,32 @@ gets and sets session id to and from cookies.
 L<MojoX::Session::Transport::Cookie> implements the following attributes.
 
 =head2 C<tx>
-    
+
     my $tx = $transport->tx;
     $transport = $transport->tx($tx);
 
 Get and set L<Mojo::Transaction> object.
+
+=head2 C<path>
+
+    my $path = $transport->path;
+    $transport->path('/');
+
+Get and set cookie path.
+
+=head2 C<domain>
+
+    my $domain = $transport->domain;
+    $transport->domain('example.com');
+
+Get and set cookie domain.
+
+=head2 C<secure>
+
+    my $secure = $transport->secure;
+    $transport->secure(1);
+
+Get and set cookie secure flag.
 
 =head1 METHODS
 

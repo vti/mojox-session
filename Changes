@@ -1,5 +1,8 @@
 Revision history for MojoX-Session
 
+0.06    2009-01-25 00:00:00
+        - path, domain, secure cookie flags
+
 0.05    2009-01-20 00:00:00
         - wrong generated id length fix
 
