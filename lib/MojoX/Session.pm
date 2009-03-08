@@ -3,25 +3,29 @@ package MojoX::Session;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use base 'Mojo::Base';
 
+use Mojo::Transaction;
 use Digest::SHA1;
 
-__PACKAGE__->attr('store', chained => 1);
+__PACKAGE__->attr(
+    tx => (chained => 1, weak => 1, default => sub { Mojo::Transaction->new })
+);
+__PACKAGE__->attr('store',     chained => 1);
 __PACKAGE__->attr('transport', chained => 1);
 
-__PACKAGE__->attr('ip_match', default => 0, chained => 1);
+__PACKAGE__->attr('ip_match',      default => 0,    chained => 1);
 __PACKAGE__->attr('expires_delta', default => 3600, chained => 1);
 
-__PACKAGE__->attr('_is_new', default => 0);
-__PACKAGE__->attr('_is_stored', default => 0);
+__PACKAGE__->attr('_is_new',     default => 0);
+__PACKAGE__->attr('_is_stored',  default => 0);
 __PACKAGE__->attr('_is_flushed', default => 1);
 
 __PACKAGE__->attr('sid', chained => 1);
 __PACKAGE__->attr('_expires', chained => 1, default => 0);
-__PACKAGE__->attr('_data', default => sub {{}});
+__PACKAGE__->attr('_data', default => sub { {} });
 
 sub create {
     my $self = shift;
@@ -36,7 +40,10 @@ sub create {
 
     $self->_generate_sid;
 
-    $self->transport->set($self->sid, $self->expires) if $self->transport;
+    if ($self->transport) {
+        $self->transport->tx($self->tx);
+        $self->transport->set($self->sid, $self->expires);
+    }
 
     $self->_is_flushed(0);
 
@@ -51,14 +58,19 @@ sub load {
     $self->_expires(0);
     $self->_data({});
 
+    if ($self->transport) {
+        $self->transport->tx($self->tx);
+    }
+
     unless ($sid) {
-        $sid = $self->transport->get if $self->transport;
+        $sid = $self->transport->get;
         return unless $sid;
     }
 
     my ($expires, $data) = $self->store->load($sid);
     unless (defined $expires && defined $data) {
-        $self->transport->set($sid, time - 30 * 24 * 3600) if $self->transport;
+        $self->transport->set($sid, time - 30 * 24 * 3600)
+          if $self->transport;
         return;
     }
 
@@ -95,7 +107,8 @@ sub flush {
         $self->store->create($self->sid, $self->expires, $self->data)
           if $self->store;
         $self->_is_new(0);
-    } else {
+    }
+    else {
         $self->store->update($self->sid, $self->expires, $self->data)
           if $self->store;
     }
@@ -138,7 +151,8 @@ sub clear {
 
     if ($key) {
         delete $self->_data->{$key};
-    } else {
+    }
+    else {
         $self->_data({});
     }
 
@@ -147,9 +161,12 @@ sub clear {
 
 sub expire {
     my $self = shift;
-    $self->expires(time - 30 * 24 * 3600);
+    $self->expires(0);
 
-    $self->transport->set($self->sid, $self->expires) if $self->transport;
+    if ($self->transport) {
+        $self->transport->tx($self->tx);
+        $self->transport->set($self->sid, $self->expires);
+    }
 
     return $self;
 }
@@ -171,7 +188,10 @@ sub extend_expires {
 
     $self->_expires(time + $self->expires_delta);
 
-    $self->transport->set($self->sid, $self->expires) if $self->transport;
+    if ($self->transport) {
+        $self->transport->tx($self->tx);
+        $self->transport->set($self->sid, $self->expires);
+    }
 
     $self->_is_flushed(0);
 }
@@ -182,13 +202,17 @@ sub is_expired {
     return time > $self->expires ? 1 : 0;
 }
 
-sub _remote_addr { $ENV{REMOTE_ADDR} }
+sub _remote_addr {
+    my $self = shift;
+
+    return $self->tx->remote_address;
+}
 
 sub _generate_sid {
     my $self = shift;
 
     # based on CGI::Session::ID
-    my $sha1 = Digest::SHA1->new();
+    my $sha1 = Digest::SHA1->new;
     $sha1->add($$, time, rand(time));
     $self->sid($sha1->hexdigest);
 }
@@ -203,13 +227,14 @@ MojoX::Session - Session management for Mojo
 =head1 SYNOPSIS
 
     my $session = MojoX::Session->new(
+        tx        => $tx,
         store     => MojoX::Session::Store::DBI->new(dbh  => $dbh),
-        transport => MojoX::Session::Transport::Cookie->new(tx => $tx),
+        transport => MojoX::Session::Transport::Cookie->new,
         ip_match  => 1
     );
 
-    $session->create(); # creates new session
-    $session->load();   # tries to find session
+    $session->create; # creates new session
+    $session->load;   # tries to find session
 
     $session->sid; # session id
 
@@ -219,7 +244,7 @@ MojoX::Session - Session management for Mojo
     $session->data('foo' => undef); # works
     $session->clear('foo'); # delete foo from data
 
-    $session->flush(); # writes session to the store
+    $session->flush; # writes session to the store
     undef $session;    # same as above
 
 =head1 DESCRIPTION
@@ -230,6 +255,13 @@ and L<HTTP::Session> but without any dependencies except the core ones.
 =head1 ATTRIBUTES
 
 L<MojoX::Session> implements the following attributes.
+
+=head2 C<tx>
+
+    Mojo::Transaction object
+
+    my $tx = $session->tx;
+    $tx    = $session->tx(Mojo::Transaction->new);
 
 =head2 C<store>
     
@@ -244,7 +276,7 @@ L<MojoX::Session> implements the following attributes.
 
     my $transport = $session->transport;
     $session
-        = $session->transport(MojoX::Session::Transport::Cookie->new(tx => $tx));
+        = $session->transport(MojoX::Session::Transport::Cookie->new);
 
 =head2 C<ip_match>
 

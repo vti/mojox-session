@@ -8,7 +8,6 @@ use base 'MojoX::Session::Transport';
 use Mojo::Cookie::Request;
 use Mojo::Cookie::Response;
 
-__PACKAGE__->attr('tx', chained => 1, weak => 1);
 __PACKAGE__->attr('name', default => 'sid', chained => 1);
 __PACKAGE__->attr('path', default => '/', chained => 1);
 __PACKAGE__->attr('domain', chained => 1);

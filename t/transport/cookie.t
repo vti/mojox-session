@@ -15,8 +15,9 @@ my $tx = Mojo::Transaction->new();
 $tx->req->cookies($cookie);
 
 my $session = MojoX::Session->new(
+    tx        => $tx,
     store     => MojoX::Session::Store::Dummy->new(),
-    transport => MojoX::Session::Transport::Cookie->new(tx => $tx)
+    transport => MojoX::Session::Transport::Cookie->new
 );
 
 my $sid = $session->create();
@@ -44,8 +45,8 @@ ok($tx->res->cookies->[0]->expires->epoch <= time - 30 * 24 * 3600);
 is($tx->res->cookies->[0]->max_age, 0);
 is($tx->res->cookies->[0]->path, '/');
 
-my $tx = Mojo::Transaction->new();
-$session->transport->tx($tx);
+my $tx = Mojo::Transaction->new;
+$session->tx($tx);
 $session->load(123);
 is($session->is_expired, 1);
 ok($tx->res->cookies->[0]->expires->epoch < time);

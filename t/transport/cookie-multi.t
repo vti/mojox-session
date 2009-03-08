@@ -16,8 +16,9 @@ my $tx = Mojo::Transaction->new;
 $tx->req->cookies($cookie, $cookie2);
 
 my $session = MojoX::Session->new(
+    tx        => $tx,
     store     => MojoX::Session::Store::Dummy->new,
-    transport => MojoX::Session::Transport::Cookie->new(tx => $tx)
+    transport => MojoX::Session::Transport::Cookie->new
 );
 
 my $sid = $session->create;
