@@ -1,5 +1,9 @@
 Revision history for MojoX-Session
 
+0.08    2009-01-25 00:00:00
+        - tx is passed to session now
+        - correct ip_match behavior
+
 0.07    2009-01-25 00:00:00
         - fix bug when there are many cookies
 
