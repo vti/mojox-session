@@ -9,7 +9,7 @@ require Carp;
 use Mojo::Transaction;
 
 __PACKAGE__->attr(
-    tx => (chained => 1, default => sub { Mojo::Transaction->new }));
+    tx => (weak => 1, chained => 1, default => sub { Mojo::Transaction->new }));
 
 sub get { Carp::croak('Method "get" not implemented by subbclass') }
 
