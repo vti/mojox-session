@@ -47,7 +47,7 @@ $session->extend_expires;
 is($session->_is_flushed, 0);
 
 # expired session
-my $sid = $session->create;
+$sid = $session->create;
 $session->expires(0);
 is($session->is_expired, 1);
 # automatically delete session if it is expired
