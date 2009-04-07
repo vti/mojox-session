@@ -27,7 +27,7 @@ sub get {
         }
     }
 
-    return $sid;
+    return "$sid";
 }
 
 sub set {
