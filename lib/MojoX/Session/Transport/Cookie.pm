@@ -22,12 +22,11 @@ sub get {
     my $sid;
     foreach my $cookie (@$cookies) {
         if ($cookie->name eq $self->name) {
-            $sid = $cookie->value;
-            last;
+            return $cookie->value->to_string;
         }
     }
 
-    return "$sid";
+    return;
 }
 
 sub set {
