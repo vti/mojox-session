@@ -74,7 +74,6 @@ sub load {
         return;
     }
 
-    $self->sid($sid);
     $self->_expires($expires);
     $self->_data($data);
 
@@ -85,6 +84,8 @@ sub load {
 
         return unless $self->_remote_addr eq $self->data('__ip_match');
     }
+
+    $self->sid($sid);
 
     $self->_is_stored(1);
 
