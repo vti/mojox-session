@@ -1,4 +1,4 @@
-use Test::More tests => 25;
+use Test::More tests => 26;
 
 use lib 't/lib';
 
@@ -32,7 +32,12 @@ ok(not defined $session->sid);
 is_deeply($session->data, {});
 is($session->expires, 0);
 
+# no data
 my $sid = $session->create();
+$session->flush();
+is($session->load($sid), $sid);
+
+$sid = $session->create();
 $session->data(foo => 'bar');
 $session->flush();
 
