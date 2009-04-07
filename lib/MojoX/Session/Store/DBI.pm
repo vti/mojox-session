@@ -55,6 +55,8 @@ sub load {
 
     my $table          = $self->table;
     my $sid_column     = $self->sid_column;
+    my $expires_column = $self->expires_column;
+    my $data_column    = $self->data_column;
 
     my $sth = $self->dbh->prepare("SELECT * FROM $table WHERE $sid_column=?");
     return unless $sth;
@@ -65,9 +67,10 @@ sub load {
     my $result = $sth->fetchrow_hashref;
     return unless $result;
 
-    $result->{data} = thaw(decode_base64($result->{data})) if $result->{data};
+    $result->{$data_column} = thaw(decode_base64($result->{$data_column}))
+      if $result->{$data_column};
 
-    return ($result->{expires}, $result->{data});
+    return ($result->{$expires_column}, $result->{$data_column});
 }
 
 sub delete {
