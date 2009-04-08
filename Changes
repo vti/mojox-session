@@ -1,5 +1,14 @@
 Revision history for MojoX-Session
 
+0.09    2009-04-08 00:00:00
+        - get rid of not initialized warnings
+        - do not set sid unless session is loaded
+        - test empty data handling
+        - do not return object, return stringified cookie
+        - fix hardcoded table column names
+        - warning fix
+        - weak tx
+
 0.08    2009-01-25 00:00:00
         - tx is passed to session now
         - correct ip_match behavior
