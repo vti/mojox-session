@@ -3,7 +3,7 @@ package MojoX::Session;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use base 'Mojo::Base';
 
@@ -396,6 +396,9 @@ L<CGI::Session>, L<HTTP::Session>
 
 vti, C<vti@cpan.org>.
 
+=head1 CREDITS
+
+William Ono
 
 =head1 COPYRIGHT
 
