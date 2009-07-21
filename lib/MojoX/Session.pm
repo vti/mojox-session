@@ -3,7 +3,7 @@ package MojoX::Session;
 use strict;
 use warnings;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 use base 'Mojo::Base';
 

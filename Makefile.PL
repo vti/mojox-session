@@ -13,7 +13,7 @@ WriteMakefile(
     PL_FILES  => {},
     PREREQ_PM => {
         'Test::More'   => 0,
-        'Mojo'         => 0,
+        'Mojo'         => '0.9002',
         'Storable'     => 0,
         'MIME::Base64' => 0,
         'Digest::SHA1' => 0

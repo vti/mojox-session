@@ -113,7 +113,7 @@ session in a database using DBIx::Class.
 L<MojoX::Session::Store::DBIC> implements the following attributes.
 
 =head2 C<resultset>
-    
+
     my $resultset = $store->resultset;
     $resultset    = $store->resultset(resultset);
 
