@@ -8,10 +8,10 @@ use base 'MojoX::Session::Store';
 use MIME::Base64;
 use Storable qw/nfreeze thaw/;
 
-__PACKAGE__->attr('resultset', chained => 1);
-__PACKAGE__->attr('sid_column', default => 'sid', chained => 1);
+__PACKAGE__->attr('resultset',      chained => 1);
+__PACKAGE__->attr('sid_column',     default => 'sid', chained => 1);
 __PACKAGE__->attr('expires_column', default => 'expires', chained => 1);
-__PACKAGE__->attr('data_column', default => 'data', chained => 1);
+__PACKAGE__->attr('data_column',    default => 'data', chained => 1);
 
 sub create {
     my ($self, $sid, $expires, $data) = @_;
@@ -23,11 +23,12 @@ sub create {
     my $expires_column = $self->expires_column;
     my $data_column    = $self->data_column;
 
-    return $resultset->create({
-        $sid_column => $sid,
-        $expires_column => $expires,
-        $data_column => $data,
-    }) ? 1 : 0;
+    return $resultset->create(
+        {   $sid_column     => $sid,
+            $expires_column => $expires,
+            $data_column    => $data,
+        }
+    ) ? 1 : 0;
 }
 
 sub update {
@@ -40,12 +41,12 @@ sub update {
     my $expires_column = $self->expires_column;
     my $data_column    = $self->data_column;
 
-    my $row = $resultset->find({ $sid_column => $sid });
-    return unless $row;
-
-    eval '$row->'.$expires_column.'($expires)';
-    eval '$row->'.$data_column.'($data)';
-    return $row->update ? 1 : 0;
+    my $set = $resultset->search({$sid_column => $sid});
+    return $set->update(
+        {   $expires_column => $expires,
+            $data_column    => $data,
+        }
+    ) ? 1 : 0;
 }
 
 sub load {
@@ -56,13 +57,13 @@ sub load {
     my $expires_column = $self->expires_column;
     my $data_column    = $self->data_column;
 
-    my $row = $resultset->find({ $sid_column => $sid });
+    my $row = $resultset->find({$sid_column => $sid});
+    return unless $row;
 
-    my $data = eval '$row->'.$data_column.'()';
-    my $expires = eval '$row->'.$expires_column.'()';
+    my $expires = $row->get_column($expires_column);
+    my $data    = $row->get_column($data_column);
 
-    $data = thaw(decode_base64($data))
-        if $data;
+    $data = thaw(decode_base64($data)) if $data;
 
     return ($expires, $data);
 }
@@ -70,14 +71,10 @@ sub load {
 sub delete {
     my ($self, $sid) = @_;
 
-    my $resultset      = $self->resultset;
-    my $sid_column     = $self->sid_column;
+    my $resultset  = $self->resultset;
+    my $sid_column = $self->sid_column;
 
-    my $row = $resultset->find({ $sid_column => $sid });
-    return unless $row;
-
-    $row->delete;
-    return 1;
+    return $resultset->search({$sid_column => $sid})->delete;
 }
 
 1;

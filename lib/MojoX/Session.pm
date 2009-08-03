@@ -3,7 +3,7 @@ package MojoX::Session;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 use base 'Mojo::Base';
 
@@ -246,7 +246,6 @@ MojoX::Session - Session management for Mojo
     $session->clear('foo'); # delete foo from data
 
     $session->flush; # writes session to the store
-    undef $session;    # same as above
 
 =head1 DESCRIPTION
 
