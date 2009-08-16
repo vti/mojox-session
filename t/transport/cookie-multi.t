@@ -5,14 +5,14 @@ use lib 't/lib';
 use_ok('MojoX::Session');
 use_ok('MojoX::Session::Transport::Cookie');
 
-use Mojo::Transaction;
+use Mojo::Transaction::Single;
 use Mojo::Cookie::Response;
 use MojoX::Session::Store::Dummy;
 
 my $cookie = Mojo::Cookie::Request->new(name => 'sid', value => 'bar');
 my $cookie2 = Mojo::Cookie::Request->new(name => 'dis', value => 'foo');
 
-my $tx = Mojo::Transaction->new;
+my $tx = Mojo::Transaction::Single->new;
 $tx->req->cookies($cookie, $cookie2);
 
 my $session = MojoX::Session->new(
