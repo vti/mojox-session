@@ -8,11 +8,11 @@ use base 'MojoX::Session::Store';
 use MIME::Base64;
 use Storable qw/nfreeze thaw/;
 
-__PACKAGE__->attr('dbh', chained => 1);
-__PACKAGE__->attr('table', default => 'session', chained => 1);
-__PACKAGE__->attr('sid_column', default => 'sid', chained => 1);
-__PACKAGE__->attr('expires_column', default => 'expires', chained => 1);
-__PACKAGE__->attr('data_column', default => 'data', chained => 1);
+__PACKAGE__->attr('dbh');
+__PACKAGE__->attr(table => 'session');
+__PACKAGE__->attr(sid_column => 'sid');
+__PACKAGE__->attr(expires_column => 'expires');
+__PACKAGE__->attr(data_column => 'data');
 
 sub create {
     my ($self, $sid, $expires, $data) = @_;

@@ -10,22 +10,19 @@ use base 'Mojo::Base';
 use Mojo::Transaction;
 use Digest::SHA1;
 
-__PACKAGE__->attr(
-    tx => (chained => 1, weak => 1, default => sub { Mojo::Transaction->new })
-);
-__PACKAGE__->attr('store',     chained => 1);
-__PACKAGE__->attr('transport', chained => 1);
+__PACKAGE__->attr(tx => sub { Mojo::Transaction->new });
+__PACKAGE__->attr([qw/ store transport /]);
 
-__PACKAGE__->attr('ip_match',      default => 0,    chained => 1);
-__PACKAGE__->attr('expires_delta', default => 3600, chained => 1);
+__PACKAGE__->attr(ip_match => 0);
+__PACKAGE__->attr(expires_delta => 3600);
 
-__PACKAGE__->attr('_is_new',     default => 0);
-__PACKAGE__->attr('_is_stored',  default => 0);
-__PACKAGE__->attr('_is_flushed', default => 1);
+__PACKAGE__->attr(_is_new => 0);
+__PACKAGE__->attr(_is_stored => 0);
+__PACKAGE__->attr(_is_flushed => 1);
 
-__PACKAGE__->attr('sid', chained => 1);
-__PACKAGE__->attr('_expires', chained => 1, default => 0);
-__PACKAGE__->attr('_data', default => sub { {} });
+__PACKAGE__->attr(sid => 1);
+__PACKAGE__->attr(_expires => 0);
+__PACKAGE__->attr(_data => sub { {} });
 
 sub create {
     my $self = shift;
