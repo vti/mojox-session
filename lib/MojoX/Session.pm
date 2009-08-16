@@ -7,10 +7,10 @@ our $VERSION = '0.12';
 
 use base 'Mojo::Base';
 
-use Mojo::Transaction;
+use Mojo::Transaction::Single;
 use Digest::SHA1;
 
-__PACKAGE__->attr(tx => sub { Mojo::Transaction->new });
+__PACKAGE__->attr(tx => sub { Mojo::Transaction::Single->new });
 __PACKAGE__->attr([qw/ sid store transport /]);
 
 __PACKAGE__->attr(ip_match => 0);
