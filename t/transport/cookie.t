@@ -39,7 +39,6 @@ $session->flush;
 my $new_cookie = $tx->res->cookies->[0];
 ok($old_cookie->expires->epoch < $new_cookie->expires->epoch);
 
-use Data::Dumper;
 $session->expire;
 ok($tx->res->cookies->[0]->expires->epoch <= time - 30 * 24 * 3600);
 is($tx->res->cookies->[0]->max_age, 0);
