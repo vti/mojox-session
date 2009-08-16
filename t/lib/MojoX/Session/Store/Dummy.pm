@@ -5,7 +5,7 @@ use warnings;
 
 use base 'MojoX::Session::Store';
 
-__PACKAGE__->attr('sessions', default => sub {{}});
+__PACKAGE__->attr('sessions' => sub {{}});
 
 sub create {
     my ($self, $sid, $expires, $data) = @_;
