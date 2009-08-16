@@ -6,7 +6,7 @@ use_ok('MojoX::Session');
 
 my $session = MojoX::Session->new();
 
-ok(not defined $session->sid);
+ok(defined $session->sid);
 is($session->expires, 0);
 is($session->is_expired, 1);
 is_deeply($session->data, {});
