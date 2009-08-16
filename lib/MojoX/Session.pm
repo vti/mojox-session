@@ -11,7 +11,7 @@ use Mojo::Transaction;
 use Digest::SHA1;
 
 __PACKAGE__->attr(tx => sub { Mojo::Transaction->new });
-__PACKAGE__->attr([qw/ store transport /]);
+__PACKAGE__->attr([qw/ sid store transport /]);
 
 __PACKAGE__->attr(ip_match => 0);
 __PACKAGE__->attr(expires_delta => 3600);
@@ -20,7 +20,6 @@ __PACKAGE__->attr(_is_new => 0);
 __PACKAGE__->attr(_is_stored => 0);
 __PACKAGE__->attr(_is_flushed => 1);
 
-__PACKAGE__->attr(sid => 1);
 __PACKAGE__->attr(_expires => 0);
 __PACKAGE__->attr(_data => sub { {} });
 
