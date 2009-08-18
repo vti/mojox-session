@@ -1,5 +1,8 @@
 Revision history for MojoX-Session
 
+0.13    2009-08-18 00:00:00
+        - Fixes due to Mojo update (David Davis)
+
 0.12    2009-08-03 00:00:00
         - Better DBIC store (William Ono)
 
