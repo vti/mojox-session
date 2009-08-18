@@ -4,7 +4,7 @@ use ExtUtils::MakeMaker;
 
 WriteMakefile(
     NAME          => 'MojoX::Session',
-    AUTHOR        => 'Viacheslav Tikhanovskii <vti@cpan.org>',
+    AUTHOR        => 'Viacheslav Tykhanovskyi <vti@cpan.org>',
     VERSION_FROM  => 'lib/MojoX/Session.pm',
     ABSTRACT_FROM => 'lib/MojoX/Session.pm',
     ($ExtUtils::MakeMaker::VERSION >= 6.3002
