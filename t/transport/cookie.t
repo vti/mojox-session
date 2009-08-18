@@ -44,7 +44,7 @@ ok($tx->res->cookies->[0]->expires->epoch <= time - 30 * 24 * 3600);
 is($tx->res->cookies->[0]->max_age, 0);
 is($tx->res->cookies->[0]->path, '/');
 
-my $tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::Single->new;
 $session->tx($tx);
 $session->load(123);
 is($session->is_expired, 1);
