@@ -1,7 +1,9 @@
 use Test::More;
 
-eval "use DBD::SQLite";
-plan skip_all => "DBD::SQLite is required to run this test" if $@;
+BEGIN {
+    eval "use DBD::SQLite";
+    plan skip_all => "DBD::SQLite is required to run this test" if $@;
+}
 
 use lib 't/lib';
 
