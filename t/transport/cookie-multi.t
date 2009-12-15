@@ -26,5 +26,7 @@ $session->flush;
 ok($sid);
 
 $cookie = Mojo::Cookie::Request->new(name => 'sid', value => $sid);
+$tx = Mojo::Transaction::Single->new;
 $tx->req->cookies($cookie2, $cookie);
+$session->tx($tx);
 is($session->load, $sid);

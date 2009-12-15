@@ -27,6 +27,8 @@ ok($sid);
 my $old_cookie = $tx->res->cookies->[0];
 
 $cookie = Mojo::Cookie::Request->new(name => 'sid', value => $sid);
+$tx = Mojo::Transaction::Single->new();
+$session->tx($tx);
 $tx->req->cookies($cookie);
 is($session->load(), $sid);
 

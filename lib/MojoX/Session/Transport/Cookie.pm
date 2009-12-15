@@ -54,7 +54,7 @@ MojoX::Session::Transport::Cookie - Cookie Transport for MojoX::Session
 =head1 SYNOPSIS
 
     my $session = MojoX::Session->new(
-        transport => MojoX::Session::Transport::Cookie->new(tx => $tx),
+        transport => MojoX::Session::Transport::Cookie->new,
         ...
     );
 
@@ -66,13 +66,6 @@ gets and sets session id to and from cookies.
 =head1 ATTRIBUTES
 
 L<MojoX::Session::Transport::Cookie> implements the following attributes.
-
-=head2 C<tx>
-
-    my $tx = $transport->tx;
-    $transport = $transport->tx($tx);
-
-Get and set L<Mojo::Transaction> object.
 
 =head2 C<path>
 

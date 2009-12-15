@@ -6,9 +6,8 @@ use warnings;
 use base 'Mojo::Base';
 
 require Carp;
-use Mojo::Transaction;
 
-__PACKAGE__->attr(tx => sub { Mojo::Transaction->new });
+__PACKAGE__->attr('tx');
 
 sub get { Carp::croak('Method "get" not implemented by subbclass') }
 
