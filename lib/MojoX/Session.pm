@@ -3,7 +3,7 @@ package MojoX::Session;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use base 'Mojo::Base';
 
@@ -11,7 +11,7 @@ use Mojo::Transaction::Single;
 use Digest::SHA1;
 
 __PACKAGE__->attr(tx => sub { Mojo::Transaction::Single->new });
-__PACKAGE__->attr([qw/ sid store transport /]);
+__PACKAGE__->attr([qw/sid store transport/]);
 
 __PACKAGE__->attr(ip_match => 0);
 __PACKAGE__->attr(expires_delta => 3600);
@@ -91,27 +91,33 @@ sub load {
 sub flush {
     my $self = shift;
 
-    return unless $self->sid && !$self->_is_flushed;
+    return 1 unless $self->sid && !$self->_is_flushed;
 
     if ($self->is_expired && $self->_is_stored) {
         $self->store->delete($self->sid) if $self->store;
         $self->_is_stored(0);
         $self->_is_flushed(1);
-        return;
+        return 1;
     }
 
+    my $ok = 1;
+
     if ($self->_is_new) {
-        $self->store->create($self->sid, $self->expires, $self->data)
+        $ok = $self->store->create($self->sid, $self->expires, $self->data)
           if $self->store;
         $self->_is_new(0);
     }
     else {
-        $self->store->update($self->sid, $self->expires, $self->data)
+        $ok = $self->store->update($self->sid, $self->expires, $self->data)
           if $self->store;
     }
 
+    return unless $ok;
+
     $self->_is_stored(1);
     $self->_is_flushed(1);
+
+    return $ok;
 }
 
 sub data {
@@ -294,7 +300,7 @@ L<MojoX::Session> inherits all methods from L<Mojo::Base> and implements the
 following new ones.
 
 =head2 C<new>
-    
+
     my $session = MojoX::Session->new(...);
 
     Returns new L<MojoX::Session> object.
@@ -323,6 +329,8 @@ Flush actually writes to the store in these situations:
 - new session was created (inserts it);
 - any value was changed (updates it)
 - session is expired (deletes it)
+
+Returns the value from the corresponding store method call.
 
 =head2 C<sid>
 
