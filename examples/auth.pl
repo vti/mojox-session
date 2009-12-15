@@ -12,8 +12,9 @@ use MojoX::Session::Transport::Cookie;
 use MojoX::Session::Store::Dummy;
 
 my $session = MojoX::Session->new(
-    transport => MojoX::Session::Transport::Cookie->new,
-    store     => MojoX::Session::Store::Dummy->new
+    transport     => MojoX::Session::Transport::Cookie->new,
+    store         => MojoX::Session::Store::Dummy->new,
+    expires_delta => 5
 );
 
 get '/' => sub {
@@ -25,6 +26,8 @@ get '/' => sub {
 
     # Check if we already have a session
     if ($session->load) {
+
+        # Browser shouldn't send a cookie, but if it does, we are ready!
         if ($session->is_expired) {
 
             # Delete session from the store
@@ -36,24 +39,29 @@ get '/' => sub {
             # Write session to the store
             $session->flush;
 
-            $message = 'Welcome again';
+            $message = 'Cheater!';
         }
         else {
-            $message = 'Welcome back';
+            $message = 'Welcome back. Wait 5 secs and refresh!';
+
+            # Extend the session
+            $session->extend_expires;
+            $session->flush;
         }
     }
     else {
+
         # Create a new session
         $session->create;
 
         # Write session to the store
         $session->flush;
 
-        $message = 'Welcome';
+        $message = 'Welcome. Refresh the page!';
     }
 
     $c->res->code(200);
-    $c->res->body("session: $message\n");
+    $c->res->body("Session state: $message\n");
 } => 'root';
 
 shagadelic('daemon');
