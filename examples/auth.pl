@@ -7,22 +7,14 @@ use lib "$FindBin::Bin/../t/lib";
 
 use Mojolicious::Lite;
 
-use MojoX::Session;
-use MojoX::Session::Transport::Cookie;
-use MojoX::Session::Store::Dummy;
-
-my $session = MojoX::Session->new(
-    transport     => MojoX::Session::Transport::Cookie->new,
-    store         => MojoX::Session::Store::Dummy->new,
-    expires_delta => 5
-);
+plugin session => {store => 'dummy', expires_delta => 5};
 
 get '/' => sub {
     my $c = shift;
 
     my $message = '';
 
-    $session->tx($c->tx);
+    my $session = $c->stash('session');
 
     # Check if we already have a session
     if ($session->load) {
@@ -36,9 +28,6 @@ get '/' => sub {
             # Create a new session
             $session->create;
 
-            # Write session to the store
-            $session->flush;
-
             $message = 'Cheater!';
         }
         else {
@@ -46,16 +35,12 @@ get '/' => sub {
 
             # Extend the session
             $session->extend_expires;
-            $session->flush;
         }
     }
     else {
 
         # Create a new session
         $session->create;
-
-        # Write session to the store
-        $session->flush;
 
         $message = 'Welcome. Refresh the page!';
     }
