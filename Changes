@@ -4,6 +4,7 @@ Revision history for MojoX-Session
         - flush method returns store value (abh suggestion)
         - Cookie transport by default
         - Autoloading store and transport classes
+        - Added Mojolicious::Plugin::Session
 
 0.13    2009-08-18 00:00:00
         - Fixes due to Mojo update (David Davis)
