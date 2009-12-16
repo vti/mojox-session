@@ -4,7 +4,7 @@ use lib 't/lib';
 
 use_ok('MojoX::Session');
 
-my $session = MojoX::Session->new();
+my $session = MojoX::Session->new;
 
 ok(not defined $session->sid);
 is($session->expires, 0);

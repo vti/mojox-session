@@ -4,12 +4,9 @@ use lib 't/lib';
 
 use_ok('MojoX::Session');
 
-use MojoX::Session::Store::Dummy;
+my $session = MojoX::Session->new(store => 'dummy');
 
-my $session =
-  MojoX::Session->new(store => MojoX::Session::Store::Dummy->new());
-
-$session->create();
+$session->create;
 my $sid = $session->sid;
 ok($sid);
 
@@ -20,13 +17,13 @@ is($session->data('foo'), 'bar');
 $session->data('foo' => 'baz');
 is($session->data->{foo}, 'baz');
 is($session->data('foo'), 'baz');
-$session->flush();
+$session->flush;
 
 ok($session->load($sid));
 is($session->data('foo'), 'baz');
 $session->data('foo' => 'zab');
 $session->data('zab' => 'foo');
-$session->flush();
+$session->flush;
 
 ok($session->load($sid));
 is($session->data('foo'), 'zab');

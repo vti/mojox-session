@@ -7,20 +7,18 @@ BEGIN {
 
 use lib 't/lib';
 
-plan tests => 11;
+plan tests => 10;
 
 use_ok('MojoX::Session');
-use_ok('MojoX::Session::Store::DBI');
 
 use NewDB;
 
 my $dbh = NewDB->dbh;
 
-my $session =
-  MojoX::Session->new(store => MojoX::Session::Store::DBI->new(dbh => $dbh));
+my $session = MojoX::Session->new(store => [dbi => {dbh => $dbh}]);
 
 # create
-my $sid = $session->create();
+my $sid = $session->create;
 ok($sid);
 ok($session->flush);
 

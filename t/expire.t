@@ -7,17 +7,14 @@ use_ok('MojoX::Session');
 use MojoX::Session::Store::Dummy;
 use MojoX::Session::Transport::Dummy;
 
-my $session = MojoX::Session->new(
-    store     => MojoX::Session::Store::Dummy->new(),
-    transport => MojoX::Session::Transport::Dummy->new(),
-);
+my $session = MojoX::Session->new(store => 'dummy', transport => 'dummy');
 
-my $sid = $session->create();
-$session->flush();
+my $sid = $session->create;
+$session->flush;
 
 is($session->is_expired, 0);
-$session->expire();
+$session->expire;
 is($session->is_expired, 1);
-$session->flush();
+$session->flush;
 
-ok(not defined $session->load());
+ok(not defined $session->load);

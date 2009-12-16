@@ -2,9 +2,9 @@ use Test::More tests => 7;
 
 use_ok('MojoX::Session');
 
-my $session = MojoX::Session->new();
+my $session = MojoX::Session->new;
 
-$session->create();
+$session->create;
 $session->data('foo' => 'bar');
 $session->flush;
 $session->clear;
@@ -18,6 +18,6 @@ $session->data('foo' => 'bar', 'baz' => 'faz');
 $session->clear('foo');
 is_deeply($session->data, {baz => 'faz'});
 
-$session->clear();
+$session->clear;
 $session->data('foo' => undef);
 is_deeply($session->data, {foo => undef});

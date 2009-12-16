@@ -2,9 +2,9 @@ use Test::More tests => 7;
 
 use_ok('MojoX::Session');
 
-my $session = MojoX::Session->new();
+my $session = MojoX::Session->new;
 
-$session->create();
+$session->create;
 $session->data('foo' => 'bar');
 $session->flush;
 
