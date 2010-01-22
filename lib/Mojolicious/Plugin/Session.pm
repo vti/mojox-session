@@ -14,11 +14,11 @@ sub register {
 
     my $stash_key = delete $args->{stash_key} || 'session';
 
-    my $session = MojoX::Session->new(%$args);
-
     $app->plugins->add_hook(
         before_dispatch => sub {
             my ($self, $c) = @_;
+
+            my $session = MojoX::Session->new(%$args);
 
             $session->tx($c->tx);
 

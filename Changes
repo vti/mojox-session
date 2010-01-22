@@ -1,5 +1,9 @@
 Revision history for MojoX-Session
 
+0.16    2010-01-22 00:00:00
+        - Fixed session initialization place in plugin to avoid cross-request
+          data sharing (mvuets, korshak)
+
 0.15    2009-12-15 00:00:00
         - flush method returns store value (abh suggestion)
         - Cookie transport by default
