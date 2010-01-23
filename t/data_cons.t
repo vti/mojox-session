@@ -7,7 +7,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 11;
+plan tests => 9;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
@@ -23,9 +23,7 @@ $t->app->{'TestServer'} = $t;
 # Touching sleepy session, which will touch fasty
 
 $t->get_ok('/sleepy')
-  ->status_is(200)
-  ->header_is(Server         => 'Mojo (Perl)')
-  ->header_is('X-Powered-By' => 'Mojolicious (Perl)');
+  ->status_is(200);
 
 my $ct =$t->_get_content($t->tx);
 # Just parse response
