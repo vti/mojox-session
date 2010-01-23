@@ -343,7 +343,7 @@ L<MojoX::Session> implements the following attributes.
 
     my $store = $session->store;
     $session  = $session->store(MojoX::Session::Store::Dbi->new(dbh => $dbh));
-    $session  = $session->store([dbi => {dbh => $dbh});
+    $session  = $session->store(dbi => {dbh => $dbh});
 
 =head2 C<transport>
 
