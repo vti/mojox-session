@@ -30,7 +30,7 @@ sub register {
         after_dispatch => sub {
             my ($self, $c) = @_;
 
-            $session->flush;
+            $c->stash($stash_key)->flush;
         }
     );
 }
