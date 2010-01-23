@@ -479,6 +479,8 @@ David Davis
 
 Maxim Vuets
 
+Sergey Zasenko
+
 William Ono
 
 Yaroslav Korshak
