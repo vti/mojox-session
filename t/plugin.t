@@ -96,7 +96,8 @@ $t->client($client);
 # Init checking
 $t->get_ok('/init_ok')->status_is(200);
 
-is( $t->_get_content($t->tx), 'ok' );
+is($t->_get_content($t->tx), 'ok');
+
 # Touching sleepy session, which will touch fasty
 $t->get_ok('/sleepy')->status_is(200);
 
