@@ -7,7 +7,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 10;
+plan tests => 11;
 
 use FindBin;
 use lib "$FindBin::Bin/lib";
