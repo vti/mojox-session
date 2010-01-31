@@ -1,5 +1,15 @@
 #!/usr/bin/perl
 
+BEGIN {
+    use Test::More;
+
+    eval "use DBD::SQLite";
+    plan skip_all => "DBD::SQLite is required to run this test" if $@;
+
+    eval "use Async::ORM";
+    plan skip_all => "Async::ORM is required to run this test" if $@;
+}
+
 package DB;
 
 use strict;
@@ -18,19 +28,9 @@ package main;
 use strict;
 use warnings;
 
-use Test::More;
-
-BEGIN {
-    eval "use DBD::SQLite";
-    plan skip_all => "DBD::SQLite is required to run this test" if $@;
-
-    eval "use Async::ORM";
-    plan skip_all => "Async::ORM is required to run this test" if $@;
-}
-
 use lib 't/lib';
 
-plan tests => 9;
+plan tests => 12;
 
 use_ok('MojoX::Session');
 use_ok('MojoX::Session::Store::AsyncOrm');
@@ -68,7 +68,7 @@ $session->load(
     $sid => sub {
         my ($self, $sid_) = @_;
 
-        is($sid_, $sid);
+        is($sid_,      $sid);
         is($self->sid, $sid);
     }
 );
@@ -87,9 +87,8 @@ $session->load(
 
 # delete
 $session->expire;
-$session->flush(sub {ok($_[1])});
-#
-#$session->load($sid => sub { ok(not defined $_[1]) });
+$session->flush(sub { ok($_[1]) });
 
+$session->load($sid => sub { ok(not defined $_[1]) });
 
 1;

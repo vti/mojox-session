@@ -134,6 +134,8 @@ sub load {
     my $self = shift;
     my ($sid, $cb) = @_;
 
+    ($cb, $sid) = ($sid, undef) if ref $sid eq 'CODE';
+
     $self->sid(undef);
     $self->_expires(0);
     $self->_data({});
@@ -209,7 +211,7 @@ sub flush {
 
     if ($self->is_expired && $self->_is_stored) {
         if ($self->store->is_async) {
-            $self->store->delete(
+            return $self->store->delete(
                 $self->sid => sub {
                     my ($store, $ok) = @_;
 
@@ -229,38 +231,39 @@ sub flush {
             return $ok;
         }
     }
-
-    my $ok = 1;
-
-    my $action = $self->_is_new ? 'create' : 'update';
-
-    $self->_is_new(0);
-
-    if ($self->store->is_async) {
-        $self->store->$action(
-            $self->sid,
-            $self->expires,
-            $self->data => sub {
-                my ($store, $ok) = @_;
-
-                return unless $ok;
-
-                $self->_is_stored(1);
-                $self->_is_flushed(1);
-
-                return $ok;
-            }
-        );
-    }
     else {
-        $ok = $self->store->$action($self->sid, $self->expires, $self->data);
+        my $ok = 1;
 
-        return unless $ok;
+        my $action = $self->_is_new ? 'create' : 'update';
 
-        $self->_is_stored(1);
-        $self->_is_flushed(1);
+        $self->_is_new(0);
 
-        return $ok;
+        if ($self->store->is_async) {
+            $self->store->$action(
+                $self->sid,
+                $self->expires,
+                $self->data => sub {
+                    my ($store, $ok) = @_;
+
+                    return $cb ? $cb->($self) : undef unless $ok;
+
+                    $self->_is_stored(1);
+                    $self->_is_flushed(1);
+
+                    return $cb ? $cb->($self, $ok) : $ok;
+                }
+            );
+        }
+        else {
+            $ok = $self->store->$action($self->sid, $self->expires, $self->data);
+
+            return unless $ok;
+
+            $self->_is_stored(1);
+            $self->_is_flushed(1);
+
+            return $ok;
+        }
     }
 }
 
