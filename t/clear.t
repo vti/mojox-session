@@ -2,7 +2,9 @@ use Test::More tests => 7;
 
 use_ok('MojoX::Session');
 
-my $session = MojoX::Session->new;
+use lib 't/lib';
+
+my $session = MojoX::Session->new(store => 'dummy');
 
 $session->create;
 $session->data('foo' => 'bar');

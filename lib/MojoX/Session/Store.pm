@@ -7,6 +7,8 @@ use base 'Mojo::Base';
 
 require Carp;
 
+__PACKAGE__->attr(is_async => 0);
+
 sub create { Carp::croak('Method "create" not implemented by subbclass') }
 
 sub update { Carp::croak('Method "update" not implemented by subbclass') }

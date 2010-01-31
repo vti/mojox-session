@@ -116,7 +116,7 @@ session in a database.
 L<MojoX::Session::Store::DBI> implements the following attributes.
 
 =head2 C<dbh>
-    
+
     my $dbh = $store->dbh;
     $store  = $store->dbh($dbh);
 
