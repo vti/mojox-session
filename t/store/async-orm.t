@@ -61,7 +61,7 @@ $session->create(
 
 ok($sid);
 
-$session->flush(sub { ok($_[1]) });
+$session->flush(sub { ok(not defined $_[0]->error) });
 
 # Load
 $session->load(
@@ -75,7 +75,7 @@ $session->load(
 
 # Update
 $session->data(foo => 'bar');
-$session->flush(sub { ok($_[1]) });
+$session->flush(sub { ok(not defined $_[0]->error) });
 
 # Load
 $session->load(

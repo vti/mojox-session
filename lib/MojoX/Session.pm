@@ -28,6 +28,8 @@ __PACKAGE__->attr(_is_flushed => 1);
 __PACKAGE__->attr(_expires => 0);
 __PACKAGE__->attr(_data => sub { {} });
 
+__PACKAGE__->attr('error');
+
 sub new {
     my $class = shift;
     my %args = @_;
@@ -154,9 +156,12 @@ sub load {
             $sid => sub {
                 my ($store, $expires, $data) = @_;
 
-                my $sid = $self->_on_load($sid, $expires, $data);
+                if ($store->error) {
+                    $self->error($store->error);
+                    return $cb ? $cb->($self) : undef;
+                }
 
-                return $cb->($self) unless $sid;
+                my $sid = $self->_on_load($sid, $expires, $data);
 
                 return $cb->($self, $sid) if $cb;
 
@@ -166,6 +171,9 @@ sub load {
     }
     else {
         my ($expires, $data) = $self->store->load($sid);
+
+        return $self->error($self->store->error) && undef
+          if $self->store->error;
 
         my $sid = $self->_on_load($sid, $expires, $data);
 
@@ -243,21 +251,27 @@ sub flush {
                 $self->sid,
                 $self->expires,
                 $self->data => sub {
-                    my ($store, $ok) = @_;
+                    my ($store) = @_;
 
-                    return $cb ? $cb->($self) : undef unless $ok;
+                    if ($store->error) {
+                        $self->error($store->error);
+                        return $cb ? $cb->($self) : undef;
+                    }
 
                     $self->_is_stored(1);
                     $self->_is_flushed(1);
 
-                    return $cb ? $cb->($self, $ok) : $ok;
+                    return $cb ? $cb->($self) : 1;
                 }
             );
         }
         else {
             $ok = $self->store->$action($self->sid, $self->expires, $self->data);
 
-            return unless $ok;
+            unless ($ok) {
+                $self->error($self->store->error);
+                return;
+            }
 
             $self->_is_stored(1);
             $self->_is_flushed(1);

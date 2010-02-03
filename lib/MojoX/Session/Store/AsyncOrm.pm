@@ -29,11 +29,16 @@ sub create {
 
     $instance->create(
         $self->dbh => sub {
-            my ($dbh, $instance) = @_;
+            my ($dbh, $instance, $error) = @_;
+
+            if ($error) {
+                $self->error($error);
+                return $cb->($self);
+            }
 
             return $cb->($self) unless $instance;
 
-            return $cb->($self, 1);
+            return $cb->($self);
         }
     );
 }
@@ -51,11 +56,16 @@ sub update {
                 $self->data_column    => $data
             }
           } => sub {
-            my ($dbh, $instance) = @_;
+            my ($dbh, $instance, $error) = @_;
+
+            if ($error) {
+                $self->error($error);
+                return $cb->($self);
+            }
 
             return $cb->($self) unless $instance;
 
-            return $cb->($self, 1);
+            return $cb->($self);
         }
     );
 }
@@ -65,7 +75,12 @@ sub load {
 
     $self->class->new($self->sid_column => $sid)->load(
         $self->dbh => sub {
-            my ($dbh, $instance) = @_;
+            my ($dbh, $instance, $error) = @_;
+
+            if ($error) {
+                $self->error($error);
+                return $cb->($self);
+            }
 
             return $cb->($self) unless $instance;
 
@@ -84,7 +99,12 @@ sub delete {
 
     $self->class->delete(
         $self->dbh => {where => [$self->sid_column => $sid]} => sub {
-            my ($dbh, $count) = @_;
+            my ($dbh, $count, $error) = @_;
+
+            if ($error) {
+                $self->error($error);
+                return $cb->($self);
+            }
 
             return $cb->($self) unless $count;
 
