@@ -10,7 +10,7 @@ BEGIN {
 use strict;
 use warnings;
 
-plan tests => 16;
+plan tests => 17;
 
 use_ok('MojoX::Session');
 use_ok('MojoX::Session::Store::Couchdb');
@@ -18,23 +18,33 @@ use_ok('MojoX::Session::Store::Couchdb');
 is(MojoX::Session::Store::Couchdb->new->is_async, 1);
 
 use Mojo::Client;
-use Mojo::IOLoop;
 
-my $ioloop = Mojo::IOLoop->new;
+my $session = MojoX::Session->new(store => 'couchdb');
 
 my $client = Mojo::Client->new;
 $client->delete('http://localhost:5984/session' => sub { })->process;
+
+# Create
+$session->create(
+    sub {
+        my ($self, $sid_) = @_;
+
+        $self->flush(
+            sub {
+                my ($self) = @_;
+
+                ok($self->error);
+            }
+        );
+    }
+);
+
 $client->put('http://localhost:5984/session' => sub { })->process;
-$client = undef;
-
-$ioloop->start;
-
-$client = Mojo::Client->new;
 
 my $sid;
 
 # Create
-my $session = MojoX::Session->new(store => 'couchdb');
+$session = MojoX::Session->new(store => 'couchdb');
 $session->create(
     sub {
         my ($self, $sid_) = @_;
