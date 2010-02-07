@@ -45,12 +45,6 @@ sub new {
     return $self;
 }
 
-sub DESTROY {
-    my $self = shift;
-
-    $self->flush;
-}
-
 sub store {
     my $self = shift;
 
@@ -215,20 +209,26 @@ sub flush {
     my $self = shift;
     my ($cb) = @_;
 
-    return $cb ? $cb->($self, 1) : 1 unless $self->sid && !$self->_is_flushed;
+    return $cb ? $cb->($self) : 1 unless $self->sid && !$self->_is_flushed;
 
     if ($self->is_expired && $self->_is_stored) {
         if ($self->store->is_async) {
-            return $self->store->delete(
+
+            $self->store->delete(
                 $self->sid => sub {
-                    my ($store, $ok) = @_;
+                    my ($store) = @_;
+
+                    if (my $error = $store->error) {
+                        $self->error($error);
+                        return $cb ? $cb->($self) : undef;
+                    }
 
                     $self->_is_stored(0);
                     $self->_is_flushed(1);
 
-                    return $cb->($self, $ok) if $cb;
+                    return $cb->($self) if $cb;
 
-                    return $ok;
+                    return 1;
                 }
             );
         }
@@ -325,6 +325,7 @@ sub clear {
 
 sub expire {
     my $self = shift;
+
     $self->expires(0);
 
     if ($self->transport) {

@@ -87,7 +87,7 @@ $session->load(
 
 # delete
 $session->expire;
-$session->flush(sub { ok($_[1]) });
+$session->flush(sub { ok(not defined $_[0]->error) });
 
 $session->load($sid => sub { ok(not defined $_[1]) });
 
