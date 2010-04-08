@@ -5,13 +5,14 @@ use lib 't/lib';
 use_ok('MojoX::Session');
 use_ok('MojoX::Session::Transport::Cookie');
 
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 use Mojo::Cookie::Response;
 use MojoX::Session::Store::Dummy;
 
-my $cookie = Mojo::Cookie::Request->new(name => 'sid', value => 'bar');
+my $cookie =
+  Mojo::Cookie::Request->new(name => 'sid', value => 'bar', path => '/');
 
-my $tx = Mojo::Transaction::Single->new();
+my $tx = Mojo::Transaction::HTTP->new();
 $tx->req->cookies($cookie);
 
 my $session = MojoX::Session->new(
@@ -26,8 +27,10 @@ ok($sid);
 
 my $old_cookie = $tx->res->cookies->[0];
 
-$cookie = Mojo::Cookie::Request->new(name => 'sid', value => $sid);
-$tx = Mojo::Transaction::Single->new();
+$tx = Mojo::Transaction::HTTP->new();
+
+$cookie = Mojo::Cookie::Request->new(name => 'sid', value => $sid, path => '/');
+$tx = Mojo::Transaction::HTTP->new();
 $session->tx($tx);
 $tx->req->cookies($cookie);
 is($session->load(), $sid);
@@ -39,14 +42,17 @@ $session->extend_expires;
 $session->flush;
 
 my $new_cookie = $tx->res->cookies->[0];
+
+$tx = Mojo::Transaction::HTTP->new;
 ok($old_cookie->expires->epoch < $new_cookie->expires->epoch);
 
+$session->tx($tx);
 $session->expire;
 ok($tx->res->cookies->[0]->expires->epoch <= time - 30 * 24 * 3600);
 is($tx->res->cookies->[0]->max_age, 0);
 is($tx->res->cookies->[0]->path, '/');
 
-$tx = Mojo::Transaction::Single->new;
+$tx = Mojo::Transaction::HTTP->new;
 $session->tx($tx);
 $session->load(123);
 is($session->is_expired, 1);

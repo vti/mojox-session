@@ -22,6 +22,7 @@ app->log->level('error');
 plugin 'session',
   store         => 'dummy',
   expires_delta => 10,
+  stash_key     => 'mojox-session',
   init          => sub {
     my ($self, $session) = @_;
     $self->stash(init => 'ok');
@@ -49,7 +50,7 @@ get '/init_ok' => sub {
 get '/sleepy' => sub {
     my $self = shift;
 
-    my $session = $self->stash('session');
+    my $session = $self->stash('mojox-session');
     $session->create;
     reset_id($session, 'sleepy');
 
@@ -78,7 +79,7 @@ get '/sleepy' => sub {
 
 get '/fasty' => sub {
     my $self    = shift;
-    my $session = $self->stash('session');
+    my $session = $self->stash('mojox-session');
 
     $session->create();
     reset_id($session, 'fasty');
