@@ -12,7 +12,7 @@ sub register {
 
     $args ||= {};
 
-    my $stash_key = delete $args->{stash_key} || 'session';
+    my $stash_key = delete $args->{stash_key} || 'mojox-session';
     my $init      = delete $args->{init};
 
     $app->plugins->add_hook(
@@ -49,18 +49,20 @@ Mojolicious::Plugin::Session - Session plugin for Mojolicious
 
     # Mojolicious::Lite
     plugin session =>
-      {stash_key => 'session', store => 'dbi', expires_delta => 5};
+      {stash_key => 'mojox-session', store => 'dbi', expires_delta => 5};
 
     # Mojolicious
     $self->plugin(
         session => {
-            stash_key     => 'session',
+            stash_key     => 'mojox-session',
             store         => 'dbi',
             expires_delta => 5
         }
     );
 
 =head1 DESCRIPTION
+
+Embedded L<Mojo> sessions are recommended for using instead of this module.
 
 L<Mojolicious::Plugin::Session> is a session plugin for L<Mojolicious>. It
 creates L<MojoX::Session> instance with provided parameters, passes $tx object
