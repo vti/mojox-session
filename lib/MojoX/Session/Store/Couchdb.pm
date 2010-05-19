@@ -10,7 +10,7 @@ use Mojo::JSON;
 
 __PACKAGE__->attr(is_async => 1);
 
-__PACKAGE__->attr(client => sub { Mojo::Client->singleton });
+__PACKAGE__->attr(client => sub { Mojo::Client->singleton->async });
 __PACKAGE__->attr(address  => 'localhost');
 __PACKAGE__->attr(port     => '5984');
 __PACKAGE__->attr(database => 'session');
@@ -67,7 +67,9 @@ sub _decode_json {
 sub create {
     my ($self, $sid, $expires, $data, $cb) = @_;
 
-    $data = $self->_encode_json({%$data, expires => $expires});
+    $self->error('');
+
+    $data = $self->_encode_json({data => $data, expires => $expires});
     return $cb->($self) unless $data;
 
     my $url = $self->_build_url($sid);
@@ -76,7 +78,7 @@ sub create {
         $url => $data => sub {
             my ($client, $tx) = @_;
 
-            if ($tx->error) {
+            if ($tx->has_error) {
                 $self->error($tx->error);
                 return $cb->($self);
             }
@@ -102,8 +104,10 @@ sub create {
 sub update {
     my ($self, $sid, $expires, $data, $cb) = @_;
 
+    $self->error('');
+
     $data =
-      $self->_encode_json({%$data, expires => $expires, _rev => $self->_rev});
+      $self->_encode_json({data => $data, expires => $expires, _rev => $self->_rev});
     return $cb->($self) unless $data;
 
     my $url = $self->_build_url($sid);
@@ -138,6 +142,8 @@ sub update {
 sub load {
     my ($self, $sid, $cb) = @_;
 
+    $self->error('');
+
     my $url = $self->_build_url($sid);
 
     $self->client->get(
@@ -170,13 +176,15 @@ sub load {
 
             my $expires = delete $body->{expires};
 
-            return $cb->($self, $expires, $body);
+            return $cb->($self, $expires, $body->{data});
         }
     )->process;
 }
 
 sub delete {
     my ($self, $sid, $cb) = @_;
+
+    $self->error('');
 
     my $url = $self->_build_url($sid, {rev => $self->_rev});
 

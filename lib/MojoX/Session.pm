@@ -3,7 +3,7 @@ package MojoX::Session;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use base 'Mojo::Base';
 
@@ -12,6 +12,8 @@ use Mojo::ByteStream;
 use Mojo::Transaction::Single;
 use MojoX::Session::Transport::Cookie;
 use Digest::SHA1;
+
+my $PRIVATE_IP_FIELD = 'mojox.session.ip_address';
 
 __PACKAGE__->attr(loader => sub { Mojo::Loader->new });
 __PACKAGE__->attr(tx     => sub { Mojo::Transaction::Single->new });
@@ -109,7 +111,7 @@ sub create {
     $self->_is_new(1);
 
     if ($self->ip_match) {
-        $self->data('__ip_match', $self->_remote_addr);
+        $self->data($PRIVATE_IP_FIELD, $self->_remote_addr);
     }
 
     $self->_generate_sid;
@@ -193,9 +195,9 @@ sub _on_load {
     if ($self->ip_match) {
         return unless $self->_remote_addr;
 
-        return unless $self->data('__ip_match');
+        return unless $self->data($PRIVATE_IP_FIELD);
 
-        return unless $self->_remote_addr eq $self->data('__ip_match');
+        return unless $self->_remote_addr eq $self->data($PRIVATE_IP_FIELD);
     }
 
     $self->sid($sid);
