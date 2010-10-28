@@ -3,7 +3,7 @@ package MojoX::Session;
 use strict;
 use warnings;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 use base 'Mojo::Base';
 
@@ -18,13 +18,14 @@ my $PRIVATE_IP_FIELD = 'mojox.session.ip_address';
 __PACKAGE__->attr(loader => sub { Mojo::Loader->new });
 __PACKAGE__->attr(tx     => sub { Mojo::Transaction::HTTP->new });
 __PACKAGE__->attr([qw/sid _store/]);
-__PACKAGE__->attr(_transport => sub { MojoX::Session::Transport::Cookie->new });
+__PACKAGE__->attr(_transport => sub { MojoX::Session::Transport::Cookie->new }
+);
 
-__PACKAGE__->attr(ip_match => 0);
+__PACKAGE__->attr(ip_match      => 0);
 __PACKAGE__->attr(expires_delta => 3600);
 
-__PACKAGE__->attr(_is_new => 0);
-__PACKAGE__->attr(_is_stored => 0);
+__PACKAGE__->attr(_is_new     => 0);
+__PACKAGE__->attr(_is_stored  => 0);
 __PACKAGE__->attr(_is_flushed => 1);
 
 __PACKAGE__->attr(_expires => 0);
@@ -34,7 +35,7 @@ __PACKAGE__->attr('error');
 
 sub new {
     my $class = shift;
-    my %args = @_;
+    my %args  = @_;
 
     my $store     = delete $args{store};
     my $transport = delete $args{transport};
@@ -89,11 +90,12 @@ sub _instance {
 
     if (ref $instance eq 'HASH') {
         die 'HASH';
+
         #$store
     }
     elsif (ref $instance eq 'ARRAY') {
-        $instance = $self->_load_and_build($namespace, $instance->[0],
-            $instance->[1]);
+        $instance =
+          $self->_load_and_build($namespace, $instance->[0], $instance->[1]);
     }
     elsif (!ref $instance) {
         $instance = $self->_load_and_build($namespace, $instance);
@@ -163,7 +165,7 @@ sub load {
 
                 return $sid;
             }
-          );
+        );
     }
     else {
         my ($expires, $data) = $self->store->load($sid);
@@ -268,7 +270,8 @@ sub flush {
             );
         }
         else {
-            $ok = $self->store->$action($self->sid, $self->expires, $self->data);
+            $ok =
+              $self->store->$action($self->sid, $self->expires, $self->data);
 
             unless ($ok) {
                 $self->error($self->store->error);
@@ -518,6 +521,7 @@ Returns session id.
     $session->data('foo' => 'bar');
     $session->data('foo' => 'bar', 'bar' => 'foo');
     $session->data('foo' => undef);
+
     # or
     my $foo = $session->data->{foo};
     $session->data->{foo} = 'bar';
@@ -571,9 +575,11 @@ L<CGI::Session>, L<HTTP::Session>
 
 =head1 AUTHOR
 
-vti, C<vti@cpan.org>.
+Viacheslav Tykhanovskyi, C<vti@cpan.org>.
 
 =head1 CREDITS
+
+Daniel Mascarenhas
 
 David Davis
 
@@ -587,7 +593,7 @@ Yaroslav Korshak
 
 =head1 COPYRIGHT
 
-Copyright (C) 2008, Viacheslav Tykhanovskyi.
+Copyright (C) 2008-2010, Viacheslav Tykhanovskyi.
 
 This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl 5.10.

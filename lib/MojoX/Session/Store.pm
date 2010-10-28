@@ -75,15 +75,4 @@ Load session. Returns $expire and $data values.
 
 Delete session. Returns status.
 
-=head1 AUTHOR
-
-vti, C<vti@cpan.org>.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2008, Viacheslav Tykhanovskyi.
-
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl 5.10.
-
 =cut

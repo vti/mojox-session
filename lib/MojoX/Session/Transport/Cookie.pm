@@ -101,15 +101,4 @@ Get session id from request cookie.
 
 Set session id to the response cookie.
 
-=head1 AUTHOR
-
-vti, C<vti@cpan.org>.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2008, Viacheslav Tykhanovskyi.
-
-This program is free software, you can redistribute it and/or modify it under
-the same terms as Perl 5.10.
-
 =cut
