@@ -12,11 +12,11 @@ WriteMakefile(
         : ()),
     PL_FILES  => {},
     PREREQ_PM => {
-        'Test::More'   => 0,
+        'Digest::SHA1' => 0,
+        'MIME::Base64' => 0,
         'Mojolicious'  => '0.999931',
         'Storable'     => 0,
-        'MIME::Base64' => 0,
-        'Digest::SHA1' => 0
+        'Test::More'   => 0,
     },
     dist  => {COMPRESS => 'gzip -9f', SUFFIX => 'gz'},
     clean => {FILES    => 'MojoX-Session-*'},
