@@ -9,14 +9,14 @@ use base 'Mojo::Base';
 
 use Mojo::Loader;
 use Mojo::ByteStream;
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 use MojoX::Session::Transport::Cookie;
 use Digest::SHA1;
 
 my $PRIVATE_IP_FIELD = 'mojox.session.ip_address';
 
 __PACKAGE__->attr(loader => sub { Mojo::Loader->new });
-__PACKAGE__->attr(tx     => sub { Mojo::Transaction::Single->new });
+__PACKAGE__->attr(tx     => sub { Mojo::Transaction::HTTP->new });
 __PACKAGE__->attr([qw/sid _store/]);
 __PACKAGE__->attr(_transport => sub { MojoX::Session::Transport::Cookie->new });
 

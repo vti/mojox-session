@@ -54,14 +54,13 @@ get '/sleepy' => sub {
     $session->create;
     reset_id($session, 'sleepy');
 
-    $self->pause;
     my $result;
 
     $self->client->get(
         '/fasty' => sub {
             my ($client, $tx) = @_;
 
-            $self->resume;
+            $self->tx->resume;
 
             my $result = $tx->res;
             $self->render_text("Session id is: '"

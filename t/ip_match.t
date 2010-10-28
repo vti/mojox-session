@@ -4,9 +4,9 @@ use lib 't/lib';
 
 use_ok('MojoX::Session');
 
-use Mojo::Transaction::Single;
+use Mojo::Transaction::HTTP;
 
-my $tx = Mojo::Transaction::Single->new;
+my $tx = Mojo::Transaction::HTTP->new;
 
 my $session = MojoX::Session->new(tx => $tx, store => 'dummy', ip_match => 1);
 
