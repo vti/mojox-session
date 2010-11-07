@@ -10,7 +10,7 @@ use Mojo::Cookie::Response;
 
 __PACKAGE__->attr(name => 'sid');
 __PACKAGE__->attr(path => '/');
-__PACKAGE__->attr([qw/ domain secure /]);
+__PACKAGE__->attr([qw/domain secure/]);
 
 sub get {
     my ($self) = @_;
@@ -21,7 +21,7 @@ sub get {
     my $sid;
     foreach my $cookie (@$cookies) {
         if ($cookie->name eq $self->name) {
-            return $cookie->value->to_string;
+            return $cookie->value;
         }
     }
 
@@ -31,7 +31,7 @@ sub get {
 sub set {
     my ($self, $sid, $expires) = @_;
 
-    my $cookie = Mojo::Cookie::Response->new();
+    my $cookie = Mojo::Cookie::Response->new;
 
     $cookie->name($self->name)->value($sid);
     $cookie->path($self->path);
