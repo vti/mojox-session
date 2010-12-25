@@ -72,7 +72,7 @@ get '/sleepy' => sub {
                   . $result->cookie('sid')->value
                   . "'");
         }
-    )->process;
+    )->start;
 
 };
 
