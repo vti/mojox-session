@@ -13,7 +13,6 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 
 use Test::Mojo;
-use Mojo::Client;
 use Mojolicious::Lite;
 
 # Silence
@@ -54,26 +53,16 @@ get '/sleepy' => sub {
     $session->create;
     reset_id($session, 'sleepy');
 
-    my $result;
+    my $res = $self->ua->get('/fasty')->res;
 
-    $self->client->get(
-        '/fasty' => sub {
-            my ($client, $tx) = @_;
-
-            $self->tx->resume;
-
-            my $result = $tx->res;
-            $self->render_text("Session id is: '"
-                  . $session->sid . "'; "
-                  . "fasty session returned "
-                  . $result->code . ': \''
-                  . $result->body
-                  . '\'; fasty cookie: \''
-                  . $result->cookie('sid')->value
-                  . "'");
-        }
-    )->start;
-
+    $self->render_text("Session id is: '"
+          . $session->sid . "'; "
+          . "fasty session returned "
+          . $res->code . ': \''
+          . $res->body
+          . '\'; fasty cookie: \''
+          . $res->cookie('sid')->value
+          . "'");
 };
 
 get '/fasty' => sub {
@@ -87,11 +76,7 @@ get '/fasty' => sub {
 
 };
 
-my $client = Mojo::Client->new(app => app);
-app->client($client);
-
 my $t = Test::Mojo->new;
-$t->client($client);
 
 # Init checking
 $t->get_ok('/init_ok')->status_is(200);

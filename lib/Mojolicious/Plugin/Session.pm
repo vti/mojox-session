@@ -17,23 +17,23 @@ sub register {
 
     $app->plugins->add_hook(
         before_dispatch => sub {
-            my ($self, $c) = @_;
+            my $self = shift;
 
             my $session = MojoX::Session->new(%$args);
 
-            $session->tx($c->tx);
+            $session->tx($self->tx);
 
-            $init->($c, $session) if $init;
+            $init->($self, $session) if $init;
 
-            $c->stash($stash_key => $session);
+            $self->stash($stash_key => $session);
         }
     );
 
     $app->plugins->add_hook(
         after_dispatch => sub {
-            my ($self, $c) = @_;
+            my $self = shift;
 
-            $c->stash($stash_key)->flush;
+            $self->stash($stash_key)->flush;
         }
     );
 }
