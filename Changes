@@ -1,5 +1,8 @@
 Revision history for MojoX-Session
 
+0.25    2012-02-11 00:00:00
+        - Fixes due to Mojolicious api change (and again)
+
 0.24    2011-07-19 00:00:00
         - Fixes due to Mojolicious api change (again)
 

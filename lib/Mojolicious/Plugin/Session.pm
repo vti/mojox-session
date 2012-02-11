@@ -15,7 +15,7 @@ sub register {
     my $stash_key = delete $args->{stash_key} || 'mojox-session';
     my $init      = delete $args->{init};
 
-    $app->plugins->add_hook(
+    $app->hook(
         before_dispatch => sub {
             my $self = shift;
 
@@ -29,7 +29,7 @@ sub register {
         }
     );
 
-    $app->plugins->add_hook(
+    $app->hook(
         after_dispatch => sub {
             my $self = shift;
 
