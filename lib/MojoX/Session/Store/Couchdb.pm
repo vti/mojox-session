@@ -5,12 +5,12 @@ use warnings;
 
 use base 'MojoX::Session::Store';
 
-use Mojo::Client;
+use Mojo::UserAgent;
 use Mojo::JSON;
 
 __PACKAGE__->attr(is_async => 1);
 
-__PACKAGE__->attr(client => sub { Mojo::Client->singleton->async });
+__PACKAGE__->attr(client => sub { Mojo::UserAgent->new; } );
 __PACKAGE__->attr(address  => 'localhost');
 __PACKAGE__->attr(port     => '5984');
 __PACKAGE__->attr(database => 'session');
@@ -74,31 +74,29 @@ sub create {
 
     my $url = $self->_build_url($sid);
 
-    $self->client->put(
-        $url => $data => sub {
-            my ($client, $tx) = @_;
+    my $tx = $self->client->put(
+        $url => $data
+    );
 
-            if ($tx->has_error) {
-                $self->error($tx->error);
-                return $cb->($self);
-            }
+    unless ($tx->success) {
+        $self->error($tx->error);
+        return $cb->($self);
+    }
 
-            unless ($tx->res->code == 201) {
-                $self->error('Wrong response');
-                return $cb->($self);
-            }
+    unless ($tx->res->code == 201) {
+        $self->error('Wrong response');
+        return $cb->($self);
+    }
 
-            my $body = $self->_decode_json($tx->res->body);
-            if ($body->{error}) {
-                $self->error($body->{error});
-                return $cb->($self);
-            }
+    my $body = $self->_decode_json($tx->res->body);
+    if ($body->{error}) {
+        $self->error($body->{error});
+        return $cb->($self);
+    }
 
-            $self->_rev($body->{_rev});
+    $self->_rev($body->{_rev});
 
-            return $cb->($self);
-        }
-    )->process;
+    return $cb->($self);
 }
 
 sub update {
@@ -112,31 +110,29 @@ sub update {
 
     my $url = $self->_build_url($sid);
 
-    $self->client->put(
-        $url => $data => sub {
-            my ($client, $tx) = @_;
+    my $tx = $self->client->put(
+        $url => $data
+    );
 
-            if ($tx->error) {
-                $self->error($tx->error);
-                return $cb->($self);
-            }
+    if ($tx->error) {
+        $self->error($tx->error);
+        return $cb->($self);
+    }
 
-            unless ($tx->res->code == 201) {
-                $self->error('Wrong response');
-                return $cb->($self);
-            }
+    unless ($tx->res->code == 201) {
+        $self->error('Wrong response');
+        return $cb->($self);
+    }
 
-            my $body = $self->_decode_json($tx->res->body);
-            if ($body->{error}) {
-                $self->error($body->{error});
-                return $cb->($self);
-            }
+    my $body = $self->_decode_json($tx->res->body);
+    if ($body->{error}) {
+        $self->error($body->{error});
+        return $cb->($self);
+    }
 
-            $self->_rev($body->{_rev});
+    $self->_rev($body->{_rev});
 
-            return $cb->($self);
-        }
-    )->process;
+    return $cb->($self);
 }
 
 sub load {
@@ -146,39 +142,35 @@ sub load {
 
     my $url = $self->_build_url($sid);
 
-    $self->client->get(
-        $url => sub {
-            my ($client, $tx) = @_;
+    my $tx = $self->client->get($url);
 
-            if ($tx->error) {
-                $self->error($tx->error);
-                return $cb->($self);
-            }
+    if ($tx->error) {
+        $self->error($tx->error);
+        return $cb->($self);
+    }
 
-            # Session not found
-            if ($tx->res->code == 404) {
-                return $cb->($self);
-            }
+    # Session not found
+    if ($tx->res->code == 404) {
+        return $cb->($self);
+    }
 
-            # Wrong response status
-            unless ($tx->res->code == 200) {
-                $self->error('Wrong response');
-                return $cb->($self);
-            }
+    # Wrong response status
+    unless ($tx->res->code == 200) {
+        $self->error('Wrong response');
+        return $cb->($self);
+    }
 
-            my $body = $self->_decode_json($tx->res->body);
+    my $body = $self->_decode_json($tx->res->body);
 
-            # CouchDB internal id
-            delete $body->{_id};
+    # CouchDB internal id
+    delete $body->{_id};
 
-            # Needed for update and delete
-            $self->_rev(delete $body->{_rev});
+    # Needed for update and delete
+    $self->_rev(delete $body->{_rev});
 
-            my $expires = delete $body->{expires};
+    my $expires = delete $body->{expires};
 
-            return $cb->($self, $expires, $body->{data});
-        }
-    )->process;
+    return $cb->($self, $expires, $body->{data});
 }
 
 sub delete {
@@ -188,31 +180,27 @@ sub delete {
 
     my $url = $self->_build_url($sid, {rev => $self->_rev});
 
-    $self->client->delete(
-        $url => sub {
-            my ($client, $tx) = @_;
+    my $tx = $self->client->delete($url);
+    
+    if ($tx->error) {
+        $self->error($tx->error);
+        return $cb->($self);
+    }
 
-            if ($tx->error) {
-                $self->error($tx->error);
-                return $cb->($self);
-            }
+    unless ($tx->res->code == 200) {
+        $self->error('Wrong response');
+        return $cb->($self);
+    }
 
-            unless ($tx->res->code == 200) {
-                $self->error('Wrong response');
-                return $cb->($self);
-            }
+    my $body = $self->_decode_json($tx->res->body);
+    return $cb->($self) unless $body;
 
-            my $body = $self->_decode_json($tx->res->body);
-            return $cb->($self) unless $body;
+    if ($body->{error}) {
+        $self->error($body->{error});
+        return $cb->($self);
+    }
 
-            if ($body->{error}) {
-                $self->error($body->{error});
-                return $cb->($self);
-            }
-
-            return $cb->($self);
-        }
-    )->process;
+    return $cb->($self);
 }
 
 1;
