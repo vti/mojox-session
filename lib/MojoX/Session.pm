@@ -11,7 +11,7 @@ use Mojo::Loader;
 use Mojo::ByteStream;
 use Mojo::Transaction::HTTP;
 use MojoX::Session::Transport::Cookie;
-use Digest::SHA1;
+use Digest::SHA;
 
 my $PRIVATE_IP_FIELD = 'mojox.session.ip_address';
 
@@ -382,7 +382,7 @@ sub _generate_sid {
     my $self = shift;
 
     # based on CGI::Session::ID
-    my $sha1 = Digest::SHA1->new;
+    my $sha1 = Digest::SHA->new(1);
     $sha1->add($$, time, rand(time));
     $self->sid($sha1->hexdigest);
 }
