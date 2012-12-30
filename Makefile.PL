@@ -31,7 +31,7 @@ WriteMakefile(
     ),
 
     PREREQ_PM => {
-        'Digest::SHA1' => 0,
+        'Digest::SHA'  => 0,
         'MIME::Base64' => 0,
         'Mojolicious'  => '2.49',
         'Storable'     => 0,
