@@ -591,6 +591,8 @@ William Ono
 
 Yaroslav Korshak
 
+Alex Hutton
+
 =head1 COPYRIGHT
 
 Copyright (C) 2008-2010, Viacheslav Tykhanovskyi.
