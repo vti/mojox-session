@@ -159,8 +159,6 @@ Load session from database.
 
 Delete session from database.
 
-=cut
-
 =head1 AUTHOR
 
 vti, C<vti@cpan.org>.
