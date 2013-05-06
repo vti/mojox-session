@@ -90,7 +90,7 @@ __END__
 
 =head1 NAME
 
-MojoX::Session::Store::DBI - DBI Store for MojoX::Session
+MojoX::Session::Store::Dbi - Dbi Store for MojoX::Session
 
 =head1 SYNOPSIS
 
@@ -102,18 +102,18 @@ MojoX::Session::Store::DBI - DBI Store for MojoX::Session
     );
 
     my $session = MojoX::Session->new(
-        store => MojoX::Session::Store::DBI->new(dbh  => $dbh),
+        store => MojoX::Session::Store::Dbi->new(dbh  => $dbh),
         ...
     );
 
 =head1 DESCRIPTION
 
-L<MojoX::Session::Store::DBI> is a store for L<MojoX::Session> that stores a
+L<MojoX::Session::Store::Dbi> is a store for L<MojoX::Session> that stores a
 session in a database.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Session::Store::DBI> implements the following attributes.
+L<MojoX::Session::Store::Dbi> implements the following attributes.
 
 =head2 C<dbh>
 
@@ -140,7 +140,7 @@ Data column name. Default is 'data'.
 
 =head1 METHODS
 
-L<MojoX::Session::Store::DBI> inherits all methods from
+L<MojoX::Session::Store::Dbi> inherits all methods from
 L<MojoX::Session::Store>.
 
 =head2 C<create>
