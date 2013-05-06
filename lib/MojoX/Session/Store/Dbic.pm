@@ -82,7 +82,7 @@ __END__
 
 =head1 NAME
 
-MojoX::Session::Store::DBIC - DBIx::Class Store for MojoX::Session
+MojoX::Session::Store::Dbic - DBIx::Class Store for MojoX::Session
 
 =head1 SYNOPSIS
 
@@ -96,18 +96,18 @@ MojoX::Session::Store::DBIC - DBIx::Class Store for MojoX::Session
     my $schema = DB->connect($dsn, $user, $pass, \%attr);
     my $rs = $schema->resultset('Session');
     my $session = MojoX::Session->new(
-        store => MojoX::Session::Store::DBI->new(resultset => $rs),
+        store => MojoX::Session::Store::Dbi->new(resultset => $rs),
         ...
     );
 
 =head1 DESCRIPTION
 
-L<MojoX::Session::Store::DBIC> is a store for L<MojoX::Session> that stores a
+L<MojoX::Session::Store::Dbic> is a store for L<MojoX::Session> that stores a
 session in a database using DBIx::Class.
 
 =head1 ATTRIBUTES
 
-L<MojoX::Session::Store::DBIC> implements the following attributes.
+L<MojoX::Session::Store::Dbic> implements the following attributes.
 
 =head2 C<resultset>
 
@@ -130,7 +130,7 @@ Data column name. Default is 'data'.
 
 =head1 METHODS
 
-L<MojoX::Session::Store::DBIC> inherits all methods from
+L<MojoX::Session::Store::Dbic> inherits all methods from
 L<MojoX::Session::Store>.
 
 =head2 C<create>
