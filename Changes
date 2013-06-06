@@ -1,5 +1,8 @@
 Revision history for MojoX-Session
 
+0.28    2013-06-06 00:00:00
+        - Fix Mojolicious update
+
 0.27    2013-05-06 00:00:00
         - Correcting Dbi/Dbic capitalisation (Alex Hutton)
 
