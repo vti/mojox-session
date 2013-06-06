@@ -43,7 +43,7 @@ sub reset_id {
 get '/init_ok' => sub {
     my $self = shift;
 
-    $self->render_text($self->stash('init'));
+    $self->render(text => $self->stash('init'));
 };
 
 get '/sleepy' => sub {
@@ -55,7 +55,7 @@ get '/sleepy' => sub {
 
     my $res = $self->ua->get('/fasty')->res;
 
-    $self->render_text("Session id is: '"
+    $self->render(text => "Session id is: '"
           . $session->sid . "'; "
           . "fasty session returned "
           . $res->code . ': \''
@@ -72,7 +72,7 @@ get '/fasty' => sub {
     $session->create();
     reset_id($session, 'fasty');
 
-    $self->render_text("This is a fasty session!");
+    $self->render(text => "This is a fasty session!");
 
 };
 
