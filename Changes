@@ -1,5 +1,9 @@
 Revision history for MojoX-Session
 
+{{$NEXT}}
+
+        - Fix test compatibility with v4.45
+
 0.28    2013-06-06 00:00:00
         - Fix Mojolicious update
 
