@@ -2,6 +2,8 @@ Revision history for MojoX-Session
 
 {{$NEXT}}
 
+0.29 2013-10-10T16:51:24Z
+
         - Fix test compatibility with v4.45
 
 0.28    2013-06-06 00:00:00
