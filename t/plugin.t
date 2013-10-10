@@ -81,12 +81,12 @@ my $t = Test::Mojo->new;
 # Init checking
 $t->get_ok('/init_ok')->status_is(200);
 
-is($t->_get_content($t->tx), 'ok');
+is($t->tx->res->text, 'ok');
 
 # Touching sleepy session, which will touch fasty
 $t->get_ok('/sleepy')->status_is(200);
 
-my $ct = $t->_get_content($t->tx);
+my $ct = $t->tx->res->text;
 
 # Just parse response
 ok($ct
