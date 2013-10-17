@@ -10,7 +10,7 @@ use Mojo::Cookie::Response;
 
 __PACKAGE__->attr(name => 'sid');
 __PACKAGE__->attr(path => '/');
-__PACKAGE__->attr([qw/domain secure/]);
+__PACKAGE__->attr([qw/domain httponly secure/]);
 
 sub get {
     my ($self) = @_;
@@ -36,6 +36,7 @@ sub set {
     $cookie->name($self->name)->value($sid);
     $cookie->path($self->path);
     $cookie->domain($self->domain);
+    $cookie->httponly($self->httponly);
     $cookie->secure($self->secure);
     $cookie->expires($expires);
 
@@ -80,6 +81,13 @@ Get and set cookie path.
     $transport->domain('example.com');
 
 Get and set cookie domain.
+
+=head2 C<httponly>
+
+    my $httponly = $transport->httponly;
+    $transport->httponly(1);
+
+Get and set cookie httponly flag.
 
 =head2 C<secure>
 
