@@ -593,9 +593,11 @@ Yaroslav Korshak
 
 Alex Hutton
 
+Sergey Homenkow
+
 =head1 COPYRIGHT
 
-Copyright (C) 2008-2010, Viacheslav Tykhanovskyi.
+Copyright (C) 2008-2013, Viacheslav Tykhanovskyi.
 
 This program is free software, you can redistribute it and/or modify it under
 the same terms as Perl 5.10.
