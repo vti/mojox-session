@@ -1,0 +1,79 @@
+{
+   "abstract" : "Session management for Mojo",
+   "author" : [
+      "Viacheslav Tykhanovskyi, C<vti@cpan.org>."
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.5, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "mojox-session",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "MIME::Base64" : "0",
+            "Mojolicious" : "4.45",
+            "Storable" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "unstable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/mojox-session/issues"
+      },
+      "homepage" : "https://github.com/vti/mojox-session",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/vti/mojox-session.git",
+         "web" : "https://github.com/vti/mojox-session"
+      }
+   },
+   "version" : "0.30",
+   "x_contributors" : [
+      "David Davis <xantus@xantus.org>",
+      "und3f <d3fin3@gmail.com>",
+      "vti <vti@evologics.de>",
+      "Daniel Mascarenhas <daniel.mts@gmail.com>",
+      "Yaroslav Korshak <ykorshak@gmail.com>",
+      "Tom Kistner <tom@kistner.nu>",
+      "Alex Hutton <highspeeddub@gmail.com>",
+      "Alex Hutton <ahutton@infoxchange.net.au>",
+      "Sergey Homenkow <sergey@homenkow.ru>",
+      "vti <viacheslav.t@gmail.com>"
+   ]
+}
