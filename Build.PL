@@ -23,7 +23,7 @@ my %args = (
         'Module::Build' => 0.38,
     },
 
-    name            => 'mojox-session',
+    name            => 'MojoX-Session',
     module_name     => 'MojoX::Session',
     allow_pureperl => 0,
 

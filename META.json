@@ -12,7 +12,7 @@
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
       "version" : "2"
    },
-   "name" : "mojox-session",
+   "name" : "MojoX-Session",
    "no_index" : {
       "directory" : [
          "t",
@@ -63,7 +63,7 @@
          "web" : "https://github.com/vti/mojox-session"
       }
    },
-   "version" : "0.30",
+   "version" : "0.31",
    "x_contributors" : [
       "David Davis <xantus@xantus.org>",
       "und3f <d3fin3@gmail.com>",
