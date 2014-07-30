@@ -22,6 +22,7 @@ sub register {
             my $session = MojoX::Session->new(%$args);
 
             $session->tx($self->tx);
+            $session->transport->tx($self->tx);
 
             $init->($self, $session) if $init;
 
