@@ -417,6 +417,7 @@ MojoX::Session - Session management for Mojo
         tx        => $tx,
         store     => MojoX::Session::Store::Dbi->new(dbh  => $dbh),
         transport => MojoX::Session::Transport::Cookie->new,
+        persistent=> 1,
         ip_match  => 1
     );
 
@@ -425,8 +426,18 @@ MojoX::Session - Session management for Mojo
         tx        => $tx,
         store     => [dbi => {dbh => $dbh}],  # use MojoX::Session::Store::Dbi
         transport => 'cookie',                # this is by default
+        persistent=> 1                        # this is by default
         ip_match  => 1
     );
+	
+	# or (in Mojolicious::Lite and DBIx::Class)
+    plugin session => {
+        stash_key     => 'session', 
+        store         => MojoX::Session::Store::Dbic->new(resultset => $rs),
+        expires_delta => 3600,
+        persistent    => 1,
+        ip_match      => 1
+    };
 
     $session->create; # creates new session
     $session->load;   # tries to find session
@@ -487,6 +498,14 @@ L<MojoX::Session> implements the following attributes.
 
     my $expires_delta = $session->expires_delta;
     $expires_delta    = $session->expires_delta(3600);
+	
+=head2 C<persistent>
+
+    Set (0|1) if this cookie is a persistent or a session cookie that will
+    be lost when user closes the browser
+
+    my $persistent    = $session->persistent;
+    $persistent       = $session->persistent(0);
 
 =head1 METHODS
 
