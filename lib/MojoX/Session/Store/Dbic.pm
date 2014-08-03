@@ -12,39 +12,46 @@ __PACKAGE__->attr('resultset');
 __PACKAGE__->attr(sid_column => 'sid');
 __PACKAGE__->attr(expires_column => 'expires');
 __PACKAGE__->attr(data_column => 'data');
+__PACKAGE__->attr(persistent_column => 'persistent');
 
 sub create {
-    my ($self, $sid, $expires, $data) = @_;
+    my ($self, $sid, $expires, $data, $persistent) = @_;
 
+	$persistent = 1 unless (defined $persistent);
     $data = encode_base64(nfreeze($data)) if $data;
 
     my $resultset      = $self->resultset;
     my $sid_column     = $self->sid_column;
     my $expires_column = $self->expires_column;
     my $data_column    = $self->data_column;
+	my $persistent_column    = $self->persistent_column;
 
     return $resultset->create(
         {   $sid_column     => $sid,
             $expires_column => $expires,
             $data_column    => $data,
+			$persistent_column => $persistent,
         }
     ) ? 1 : 0;
 }
 
 sub update {
-    my ($self, $sid, $expires, $data) = @_;
+    my ($self, $sid, $expires, $data, $persistent) = @_;
 
+	$persistent = 1 unless (defined $persistent);
     $data = encode_base64(nfreeze($data)) if $data;
 
     my $resultset      = $self->resultset;
     my $sid_column     = $self->sid_column;
     my $expires_column = $self->expires_column;
     my $data_column    = $self->data_column;
+	my $persistent_column    = $self->persistent_column;
 
     my $set = $resultset->search({$sid_column => $sid});
     return $set->update(
         {   $expires_column => $expires,
             $data_column    => $data,
+			$persistent_column => $persistent,
         }
     ) ? 1 : 0;
 }
@@ -56,16 +63,18 @@ sub load {
     my $sid_column     = $self->sid_column;
     my $expires_column = $self->expires_column;
     my $data_column    = $self->data_column;
+	my $persistent_column    = $self->persistent_column;
 
     my $row = $resultset->find({$sid_column => $sid});
     return unless $row;
 
     my $expires = $row->get_column($expires_column);
     my $data    = $row->get_column($data_column);
+	my $persistent = $row->get_column($persistent_column);
 
     $data = thaw(decode_base64($data)) if $data;
 
-    return ($expires, $data);
+    return ($expires, $data,$persistent);
 }
 
 sub delete {
@@ -90,6 +99,7 @@ MojoX::Session::Store::Dbic - DBIx::Class Store for MojoX::Session
         sid          VARCHAR(40) PRIMARY KEY,
         data         TEXT,
         expires      INTEGER UNSIGNED NOT NULL,
+		persistent   TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
         UNIQUE(sid)
     );
 

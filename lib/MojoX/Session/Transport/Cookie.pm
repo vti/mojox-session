@@ -38,9 +38,10 @@ sub set {
     $cookie->domain($self->domain);
     $cookie->httponly($self->httponly);
     $cookie->secure($self->secure);
-    $cookie->expires($expires);
-
-    $cookie->max_age(0) if $expires < time;
+	if (defined $expires) {
+    	$cookie->expires($expires);
+    	$cookie->max_age(0) if $expires < time;
+	}
 
     $self->tx->res->cookies($cookie);
 }

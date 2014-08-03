@@ -15,9 +15,10 @@ __PACKAGE__->attr('class');
 __PACKAGE__->attr(sid_column => 'sid');
 __PACKAGE__->attr(expires_column => 'expires');
 __PACKAGE__->attr(data_column => 'data');
+__PACKAGE__->attr(persistent_column => 'persistent');
 
 sub create {
-    my ($self, $sid, $expires, $data, $cb) = @_;
+    my ($self, $sid, $expires, $data, $persistent, $cb) = @_;
 
     $data = encode_base64(nfreeze($data)) if $data;
 
@@ -26,6 +27,7 @@ sub create {
     $instance->column($self->sid_column     => $sid);
     $instance->column($self->expires_column => $expires);
     $instance->column($self->data_column    => $data);
+	$instance->column($self->persistent_column => $persistent);
 
     $instance->create(
         $self->dbh => sub {
@@ -44,7 +46,7 @@ sub create {
 }
 
 sub update {
-    my ($self, $sid, $expires, $data, $cb) = @_;
+    my ($self, $sid, $expires, $data, $persistent, $cb) = @_;
 
     $data = encode_base64(nfreeze($data)) if $data;
 
@@ -53,7 +55,8 @@ sub update {
             where => [$self->sid_column => $sid],
             set   => {
                 $self->expires_column => $expires,
-                $self->data_column    => $data
+                $self->data_column    => $data,
+				$self->persistent_column => $persistent
             }
           } => sub {
             my ($dbh, $instance, $error) = @_;
@@ -89,7 +92,7 @@ sub load {
             $data = thaw(decode_base64($data)) if $data;
 
             return $cb->($self, $instance->column($self->expires_column),
-                $data);
+                $data, $instance->column($self->persistent_column));
         }
     );
 }

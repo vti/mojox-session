@@ -13,41 +13,48 @@ __PACKAGE__->attr(table => 'session');
 __PACKAGE__->attr(sid_column => 'sid');
 __PACKAGE__->attr(expires_column => 'expires');
 __PACKAGE__->attr(data_column => 'data');
+__PACKAGE__->attr(persistent_column => 'persistent');
 
 sub create {
-    my ($self, $sid, $expires, $data) = @_;
+    my ($self, $sid, $expires, $data, $persistent) = @_;
 
+	$persistent = 1 unless (defined $persistent);
     $data = encode_base64(nfreeze($data)) if $data;
 
     my $table          = $self->table;
     my $sid_column     = $self->sid_column;
     my $expires_column = $self->expires_column;
     my $data_column    = $self->data_column;
+    my $persistent_column    = $self->persistent_column;
 
     my $sth = $self->dbh->prepare(<<"");
-    INSERT INTO $table ($sid_column,$expires_column,$data_column) VALUES (?,?,?)
+    INSERT INTO $table
+	($sid_column,$expires_column,$data_column,$persistent_column) VALUES
+	(?,?,?,?)
 
     return unless $sth;
 
-    return $sth->execute($sid, $expires, $data);
+    return $sth->execute($sid, $expires, $data,$persistent);
 }
 
 sub update {
-    my ($self, $sid, $expires, $data) = @_;
+    my ($self, $sid, $expires, $data, $persistent) = @_;
 
+	$persistent = 1 unless (defined $persistent);
     $data = encode_base64(nfreeze($data)) if $data;
 
     my $table          = $self->table;
     my $sid_column     = $self->sid_column;
     my $expires_column = $self->expires_column;
     my $data_column    = $self->data_column;
+    my $persistent_column    = $self->persistent_column;
 
     my $sth = $self->dbh->prepare(<<"");
-    UPDATE $table SET $expires_column=?,$data_column=? WHERE $sid_column=?
+    UPDATE $table SET $expires_column=?,$data_column=?,$persistent_column=? WHERE $sid_column=?
 
     return unless $sth;
 
-    return $sth->execute($expires, $data, $sid);
+    return $sth->execute($expires, $data, $persistent, $sid);
 }
 
 sub load {
@@ -57,6 +64,7 @@ sub load {
     my $sid_column     = $self->sid_column;
     my $expires_column = $self->expires_column;
     my $data_column    = $self->data_column;
+    my $persistent_column    = $self->persistent_column;
 
     my $sth = $self->dbh->prepare("SELECT * FROM $table WHERE $sid_column=?");
     return unless $sth;
@@ -70,7 +78,8 @@ sub load {
     $result->{$data_column} = thaw(decode_base64($result->{$data_column}))
       if $result->{$data_column};
 
-    return ($result->{$expires_column}, $result->{$data_column});
+    return ($result->{$expires_column}, $result->{$data_column},
+	$result->{$persistent_column});
 }
 
 sub delete {
@@ -98,6 +107,7 @@ MojoX::Session::Store::Dbi - Dbi Store for MojoX::Session
         sid          VARCHAR(40) PRIMARY KEY,
         data         TEXT,
         expires      INTEGER UNSIGNED NOT NULL,
+		persistent   TINYINT(1) UNSIGNED NOT NULL DEFAULT '1',
         UNIQUE(sid)
     );
 

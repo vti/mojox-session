@@ -65,11 +65,12 @@ sub _decode_json {
 }
 
 sub create {
-    my ($self, $sid, $expires, $data, $cb) = @_;
+    my ($self, $sid, $expires, $data, $persistent, $cb) = @_;
 
     $self->error('');
 
-    $data = $self->_encode_json({data => $data, expires => $expires});
+    $data = $self->_encode_json({data => $data, expires => $expires,
+		persistent => $persistent});
     return $cb->($self) unless $data;
 
     my $url = $self->_build_url($sid);
@@ -100,12 +101,13 @@ sub create {
 }
 
 sub update {
-    my ($self, $sid, $expires, $data, $cb) = @_;
+    my ($self, $sid, $expires, $data, $persistent, $cb) = @_;
 
     $self->error('');
 
     $data =
-      $self->_encode_json({data => $data, expires => $expires, _rev => $self->_rev});
+      $self->_encode_json({data => $data, expires => $expires, 
+	  	_rev => $self->_rev, persistent => $persistent});
     return $cb->($self) unless $data;
 
     my $url = $self->_build_url($sid);
@@ -169,8 +171,9 @@ sub load {
     $self->_rev(delete $body->{_rev});
 
     my $expires = delete $body->{expires};
+	my $persistent = delete $body->{persistent};
 
-    return $cb->($self, $expires, $body->{data});
+    return $cb->($self, $expires, $body->{data}, $persistent);
 }
 
 sub delete {

@@ -3,7 +3,7 @@ package MojoX::Session;
 use strict;
 use warnings;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 use base 'Mojo::Base';
 
@@ -23,6 +23,7 @@ __PACKAGE__->attr(_transport => sub { MojoX::Session::Transport::Cookie->new }
 
 __PACKAGE__->attr(ip_match      => 0);
 __PACKAGE__->attr(expires_delta => 3600);
+__PACKAGE__->attr(persistent 	=> 1);
 
 __PACKAGE__->attr(_is_new     => 0);
 __PACKAGE__->attr(_is_stored  => 0);
@@ -120,7 +121,11 @@ sub create {
 
     if ($self->transport) {
         $self->transport->tx($self->tx);
-        $self->transport->set($self->sid, $self->expires);
+		if ($self->persistent) {
+        	$self->transport->set($self->sid, $self->expires);
+		} else {
+        	$self->transport->set($self->sid);
+		}
     }
 
     $self->_is_flushed(0);
@@ -152,14 +157,14 @@ sub load {
     if ($self->store->is_async) {
         $self->store->load(
             $sid => sub {
-                my ($store, $expires, $data) = @_;
+                my ($store, $expires, $data,$persistent) = @_;
 
                 if ($store->error) {
                     $self->error($store->error);
                     return $cb ? $cb->($self) : undef;
                 }
 
-                my $sid = $self->_on_load($sid, $expires, $data);
+                my $sid = $self->_on_load($sid, $expires, $data,$persistent);
 
                 return $cb->($self, $sid) if $cb;
 
@@ -168,12 +173,12 @@ sub load {
         );
     }
     else {
-        my ($expires, $data) = $self->store->load($sid);
+        my ($expires, $data, $persistent) = $self->store->load($sid);
 
         return $self->error($self->store->error) && undef
           if $self->store->error;
 
-        my $sid = $self->_on_load($sid, $expires, $data);
+        my $sid = $self->_on_load($sid, $expires, $data,$persistent);
 
         return unless $sid;
 
@@ -183,14 +188,17 @@ sub load {
 
 sub _on_load {
     my $self = shift;
-    my ($sid, $expires, $data) = @_;
+    my ($sid, $expires, $data,$persistent) = @_;
 
     unless (defined $expires && defined $data) {
-        $self->transport->set($sid, time - 30 * 24 * 3600)
-          if $self->transport;
+		if ($self->persistent) {
+        	$self->transport->set($sid, time - 30 * 24 * 3600)
+       	   		if $self->transport;
+		}
         return;
     }
 
+	$self->persistent($persistent);
     $self->_expires($expires);
     $self->_data($data);
 
@@ -266,12 +274,13 @@ sub flush {
                     $self->_is_flushed(1);
 
                     return $cb ? $cb->($self) : 1;
-                }
+                }, $self->persistent
             );
         }
         else {
             $ok =
-              $self->store->$action($self->sid, $self->expires, $self->data);
+              $self->store->$action($self->sid, $self->expires, 
+			  	$self->data, $self->persistent);
 
             unless ($ok) {
                 $self->error($self->store->error);
@@ -335,7 +344,11 @@ sub expire {
 
     if ($self->transport) {
         $self->transport->tx($self->tx);
-        $self->transport->set($self->sid, $self->expires);
+		if ($self->persistent) {
+	        $self->transport->set($self->sid, $self->expires);
+		} else {
+	        $self->transport->set($self->sid);
+		}
     }
 
     return $self;
@@ -360,7 +373,11 @@ sub extend_expires {
 
     if ($self->transport) {
         $self->transport->tx($self->tx);
-        $self->transport->set($self->sid, $self->expires);
+		if ($self->persistent) {
+        	$self->transport->set($self->sid, $self->expires);
+		} else {
+        	$self->transport->set($self->sid);
+		}
     }
 
     $self->_is_flushed(0);
@@ -400,6 +417,7 @@ MojoX::Session - Session management for Mojo
         tx        => $tx,
         store     => MojoX::Session::Store::Dbi->new(dbh  => $dbh),
         transport => MojoX::Session::Transport::Cookie->new,
+        persistent=> 1,
         ip_match  => 1
     );
 
@@ -408,8 +426,18 @@ MojoX::Session - Session management for Mojo
         tx        => $tx,
         store     => [dbi => {dbh => $dbh}],  # use MojoX::Session::Store::Dbi
         transport => 'cookie',                # this is by default
+        persistent=> 1                        # this is by default
         ip_match  => 1
     );
+	
+	# or (in Mojolicious::Lite and DBIx::Class)
+    plugin session => {
+        stash_key     => 'session', 
+        store         => MojoX::Session::Store::Dbic->new(resultset => $rs),
+        expires_delta => 3600,
+        persistent    => 1,
+        ip_match      => 1
+    };
 
     $session->create; # creates new session
     $session->load;   # tries to find session
@@ -470,6 +498,14 @@ L<MojoX::Session> implements the following attributes.
 
     my $expires_delta = $session->expires_delta;
     $expires_delta    = $session->expires_delta(3600);
+	
+=head2 C<persistent>
+
+    Set (0|1) if this cookie is a persistent or a session cookie that will
+    be lost when user closes the browser
+
+    my $persistent    = $session->persistent;
+    $persistent       = $session->persistent(0);
 
 =head1 METHODS
 

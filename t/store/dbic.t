@@ -11,7 +11,7 @@ BEGIN {
 }
 
 use lib 't/lib';
-
+DBIx::Class::Schema::Loader->naming('v5');
 plan tests => 10;
 
 use_ok('MojoX::Session');

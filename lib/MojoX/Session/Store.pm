@@ -30,13 +30,13 @@ MojoX::Session::Store - Base class for store
     use base 'MojoX::Session::Store';
 
     sub create {
-        my ($self, $sid, $expires, $data) = @_;
+        my ($self, $sid, $expires, $data, $persistent) = @_;
         ...
         return 1;
     }
 
     sub update {
-        my ($self, $sid, $expires, $data) = @_;
+        my ($self, $sid, $expires, $data, $persistent) = @_;
         ...
         return 1;
     }
@@ -44,7 +44,7 @@ MojoX::Session::Store - Base class for store
     sub load {
         my ($self, $sid) = @_;
         ...
-        return ($expires, $data);
+        return ($expires, $data, $persistent);
     }
 
     sub delete {

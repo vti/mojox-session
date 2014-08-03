@@ -2,6 +2,17 @@ Revision history for MojoX-Session
 
 {{$NEXT}}
 
+0.32
+        - Add a persistent attribute to MojoX::Session to set if Cookie is
+		  persistent or not. (default = 1) which gives backward
+		  compatibility with previous version. You can upgrade your db with
+		  this query:
+		    ALTER TABLE YOUR_SESSION_TABLE_NAME ADD COLUMN
+			  `persistent` tinyint(1) unsigned NOT NULL DEFAULT '1';
+        - Changes in other files to support this new attribute
+        - Solved a bug in Mojolicious::Plugin::Session
+		- Removed a warning in dbic test
+
 0.31 2014-01-07T08:04:08Z
 
         - Just meta files update

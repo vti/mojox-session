@@ -7,7 +7,7 @@ use DBI;
 use File::Spec;
 
 sub _file {
-    return File::Spec->catfile(File::Spec->tmpdir, 'test.db');
+    return File::Spec->catfile(File::Spec->tmpdir, 'testp.db');
 }
 
 sub dbi {
@@ -29,6 +29,7 @@ sub dbh {
                 sid          VARCHAR(40) PRIMARY KEY,
                 data         TEXT,
                 expires      INTEGER UNSIGNED NOT NULL,
+				persistent   INTEGER UNSIGNED NOT NULL DEFAULT 1,
                 UNIQUE(sid)
             );
 
