@@ -18,7 +18,7 @@ __PACKAGE__->attr(persistent_column => 'persistent');
 sub create {
     my ($self, $sid, $expires, $data, $persistent) = @_;
 
-	$persistent = 1 unless ($persistent);
+	$persistent = 1 unless (defined $persistent);
     $data = encode_base64(nfreeze($data)) if $data;
 
     my $table          = $self->table;
@@ -40,7 +40,7 @@ sub create {
 sub update {
     my ($self, $sid, $expires, $data, $persistent) = @_;
 
-	$persistent = 1 unless ($persistent);
+	$persistent = 1 unless (defined $persistent);
     $data = encode_base64(nfreeze($data)) if $data;
 
     my $table          = $self->table;
