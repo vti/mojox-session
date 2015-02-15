@@ -44,11 +44,11 @@ $session->flush;
 my $new_cookie = $tx->res->cookies->[0];
 
 $tx = Mojo::Transaction::HTTP->new;
-ok($old_cookie->expires->epoch < $new_cookie->expires->epoch);
+ok($old_cookie->expires < $new_cookie->expires);
 
 $session->tx($tx);
 $session->expire;
-ok($tx->res->cookies->[0]->expires->epoch <= time - 30 * 24 * 3600);
+ok($tx->res->cookies->[0]->expires <= time - 30 * 24 * 3600);
 is($tx->res->cookies->[0]->max_age, 0);
 is($tx->res->cookies->[0]->path, '/');
 
@@ -56,4 +56,4 @@ $tx = Mojo::Transaction::HTTP->new;
 $session->tx($tx);
 $session->load(123);
 is($session->is_expired, 1);
-ok($tx->res->cookies->[0]->expires->epoch < time);
+ok($tx->res->cookies->[0]->expires < time);
