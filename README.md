@@ -34,12 +34,12 @@ MojoX::Session - Session management for Mojo
 
 # DESCRIPTION
 
-[MojoX::Session](http://search.cpan.org/perldoc?MojoX::Session) is a session management for [Mojo](http://search.cpan.org/perldoc?Mojo). Based on [CGI::Session](http://search.cpan.org/perldoc?CGI::Session)
-and [HTTP::Session](http://search.cpan.org/perldoc?HTTP::Session) but without any dependencies except the core ones.
+[MojoX::Session](https://metacpan.org/pod/MojoX::Session) is a session management for [Mojo](https://metacpan.org/pod/Mojo). Based on [CGI::Session](https://metacpan.org/pod/CGI::Session)
+and [HTTP::Session](https://metacpan.org/pod/HTTP::Session) but without any dependencies except the core ones.
 
 # ATTRIBUTES
 
-[MojoX::Session](http://search.cpan.org/perldoc?MojoX::Session) implements the following attributes.
+[MojoX::Session](https://metacpan.org/pod/MojoX::Session) implements the following attributes.
 
 ## `tx`
 
@@ -81,7 +81,7 @@ and [HTTP::Session](http://search.cpan.org/perldoc?HTTP::Session) but without an
 
 # METHODS
 
-[MojoX::Session](http://search.cpan.org/perldoc?MojoX::Session) inherits all methods from [Mojo::Base](http://search.cpan.org/perldoc?Mojo::Base) and implements the
+[MojoX::Session](https://metacpan.org/pod/MojoX::Session) inherits all methods from [Mojo::Base](https://metacpan.org/pod/Mojo::Base) and implements the
 following new ones.
 
 ## `new`
@@ -179,7 +179,7 @@ Entend session expires time. Set it to current\_time + expires\_delta.
 
 # SEE ALSO
 
-[CGI::Session](http://search.cpan.org/perldoc?CGI::Session), [HTTP::Session](http://search.cpan.org/perldoc?HTTP::Session)
+[CGI::Session](https://metacpan.org/pod/CGI::Session), [HTTP::Session](https://metacpan.org/pod/HTTP::Session)
 
 # AUTHOR
 

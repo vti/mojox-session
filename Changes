@@ -2,6 +2,10 @@ Revision history for MojoX-Session
 
 {{$NEXT}}
 
+0.32 2015-02-15T18:12:59Z
+
+        - Fix test compatibility with v5.78
+
 0.31 2014-01-07T08:04:08Z
 
         - Just meta files update
