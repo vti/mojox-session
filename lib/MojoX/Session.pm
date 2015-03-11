@@ -15,7 +15,7 @@ use Digest::SHA;
 
 my $PRIVATE_IP_FIELD = 'mojox.session.ip_address';
 
-__PACKAGE__->attr(loader => sub { Mojo::Loader->new });
+__PACKAGE__->attr(loader => sub { my $l; eval { $l = Mojo::Loader->new }; $l });
 __PACKAGE__->attr(tx     => sub { Mojo::Transaction::HTTP->new });
 __PACKAGE__->attr([qw/sid _store/]);
 __PACKAGE__->attr(_transport => sub { MojoX::Session::Transport::Cookie->new }
@@ -71,7 +71,7 @@ sub _load_and_build {
     my $class = join('::',
         __PACKAGE__, $namespace, Mojo::ByteStream->new($name)->camelize);
 
-    my $rv = $self->loader->load($class);
+    my $rv = $self->loader ? $self->loader->load($class) : Mojo::Loader::load_class($class);
 
     if (defined $rv) {
         die qq/Store "$class" can not be loaded : $rv/ if ref $rv;
