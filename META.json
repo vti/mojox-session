@@ -62,7 +62,7 @@
          "web" : "https://github.com/vti/mojox-session"
       }
    },
-   "version" : "0.32",
+   "version" : "0.33",
    "x_contributors" : [
       "David Davis <xantus@xantus.org>",
       "und3f <d3fin3@gmail.com>",
@@ -73,6 +73,7 @@
       "Alex Hutton <highspeeddub@gmail.com>",
       "Alex Hutton <ahutton@infoxchange.net.au>",
       "Sergey Homenkow <sergey@homenkow.ru>",
-      "vti <viacheslav.t@gmail.com>"
+      "Jeen Lee <aiatejin@gmail.com>",
+      "Viacheslav Tykhanovskyi <viacheslav.t@gmail.com>"
    ]
 }

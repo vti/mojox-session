@@ -2,6 +2,10 @@ Revision history for MojoX-Session
 
 {{$NEXT}}
 
+0.33 2015-03-11T08:58:45Z
+
+        - Fix a build error @ Mojolicious 6.* (Jeen Lee)
+
 0.32 2015-02-15T18:12:59Z
 
         - Fix test compatibility with v5.78
