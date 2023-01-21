@@ -10,7 +10,7 @@ use Mojo::Cookie::Response;
 
 __PACKAGE__->attr(name => 'sid');
 __PACKAGE__->attr(path => '/');
-__PACKAGE__->attr([qw/domain httponly secure/]);
+__PACKAGE__->attr([qw/domain httponly secure samesite/]);
 
 sub get {
     my ($self) = @_;
@@ -38,6 +38,7 @@ sub set {
     $cookie->domain($self->domain);
     $cookie->httponly($self->httponly);
     $cookie->secure($self->secure);
+    $cookie->samesite($self->samesite);
     $cookie->expires($expires);
 
     $cookie->max_age(0) if $expires < time;
