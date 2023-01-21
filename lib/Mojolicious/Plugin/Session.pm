@@ -24,16 +24,19 @@ sub register {
             $session->tx($self->tx);
 
             $init->($self, $session) if $init;
+            $session->load or $session->create; # really?!
 
             $self->stash($stash_key => $session);
+            return;
         }
     );
 
     $app->hook(
         after_dispatch => sub {
             my $self = shift;
-
-            $self->stash($stash_key)->flush;
+            my $session = $self->stash($stash_key);
+            $session->flush if $session;
+            return;
         }
     );
 }
